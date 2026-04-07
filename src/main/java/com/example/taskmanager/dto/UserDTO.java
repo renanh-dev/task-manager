@@ -1,3 +1,8 @@
 package com.example.taskmanager.dto;
 
-public record UserDTO(String username, String password, String role) {}
+public record UserDTO(
+        Long id,
+        String username,
+        String password,
+        String role
+) {}

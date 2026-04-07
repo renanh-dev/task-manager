@@ -11,4 +11,14 @@ public class TaskManagerApplication {
     }
 }
 
-/* OBJECTIVE OF THE APP: Experiment with CRUD (Create, Read, Update, Delete). Make specific URLs manipulate tasks. */
+/* OBJECTIVE OF THE APP: Experiment with CRUD (Create, Read, Update, Delete). Make specific URLs manipulate tasks.
+Real systems usually expand this by having all of these:
+    global exception handling
+    logging
+    API documentation
+    pagination
+    rate limiting
+    caching
+    metrics
+    monitoring
+* */

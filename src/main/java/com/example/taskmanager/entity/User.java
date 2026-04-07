@@ -5,12 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+@Entity // Data validation should not happen here, @Entity is supposed to be a model for the database.
 @Getter
 @Setter
 @Table(name = "Users")
 @NoArgsConstructor
-
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,10 +17,4 @@ public class User {
     private String username;
     private String password;
     private String role;
-
-    public User(String username, String password, String role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-    }
 }

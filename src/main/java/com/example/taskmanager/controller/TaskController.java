@@ -1,8 +1,9 @@
 package com.example.taskmanager.controller;
 
-import com.example.taskmanager.dto.CreateTaskRequest;
+import com.example.taskmanager.dto.TaskRequest;
 import com.example.taskmanager.dto.TaskDTO;
 import com.example.taskmanager.service.TaskService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,18 +24,28 @@ import java.util.List;
                     @RequestBody tells Spring the data is being received from a JSON, and it automatically parses it into a Java Object.
                     @PathVariable tells Spring the data is being received from the URL itself and parses it into a normal variable like "Long id"
                 */
-@RequestMapping("/api")
+@RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
 
-    @PostMapping("/tasks") // No need to write "createTasks" since "@PostMapping" already tells you what the method does with tasks.
-    public TaskDTO createTask(@RequestBody CreateTaskRequest taskRequest) {
+    @PostMapping // No need to write "createTasks" since "@PostMapping" already tells you what the method does with tasks.
+    public TaskDTO createTask(@Valid @RequestBody TaskRequest taskRequest) {
         return taskService.createTask(taskRequest);
     }
 
-    @GetMapping("/tasks") // "/tasks" represents
+    @GetMapping
     public List<TaskDTO> getTasks() {
         return taskService.getTasks();
+    }
+
+    @GetMapping("/{id}")
+    public TaskDTO getTask(@PathVariable Long id) {
+        return taskService.getTask(id);
+    }
+
+    @DeleteMapping
+    public void deleteTask(@PathVariable Long id) {
+        taskService.deleteTask(id);
     }
 }
