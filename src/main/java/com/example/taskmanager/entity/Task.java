@@ -1,22 +1,29 @@
 package com.example.taskmanager.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity // This tells Spring Data JPA this should be mapped to the Database.
-
-@Data /* arguably better to use @Getter and @Setter along with @NoArgsConstructor and @AllArgsConstructor because
+        /* arguably better to use @Getter and @Setter along with @NoArgsConstructor and @AllArgsConstructor because
          of hashCode() and equals() causing issues with Database relationships */
+@Getter
+@Setter
+@Table(name = "tasks")
+@NoArgsConstructor
 
-public class Task { // You only use the keyword "new" for entities and DTOs (Data Transfer Objects) in @Service.
+public class Task { // You only use the keyword "new" (create objects) for entities and DTOs (Data Transfer Objects) in @Service.
     @Id // This tells Spring Data JPA that the variable "long id" is the primary key identifier of a Task object in the Database.
 
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment. Logic for increasing number of IDs.
-    private long id;
+    @Setter(AccessLevel.NONE)
+    private Long id;
     private String title;
     private String description;
     private boolean completed;
+
+    public Task(String title, String description) { // Usually in @Entity you have manual constructors due to usual logic when creating the objects.
+        this.title = title;
+        this.description = description;
+        this.completed = false;
+    }
 }

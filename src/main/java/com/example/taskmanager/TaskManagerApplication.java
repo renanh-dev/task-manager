@@ -10,3 +10,5 @@ public class TaskManagerApplication {
         SpringApplication.run(TaskManagerApplication.class, args); // 99% of cases it's never altered from this.
     }
 }
+
+/* OBJECTIVE OF THE APP: Experiment with CRUD (Create, Read, Update, Delete). Make specific URLs manipulate tasks. */

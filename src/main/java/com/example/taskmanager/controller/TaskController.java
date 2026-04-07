@@ -1,9 +1,9 @@
 package com.example.taskmanager.controller;
 
-import com.example.taskmanager.entity.Task;
-import com.example.taskmanager.repository.TaskRepository;
+import com.example.taskmanager.dto.CreateTaskRequest;
+import com.example.taskmanager.dto.TaskDTO;
 import com.example.taskmanager.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,44 +12,29 @@ import java.util.List;
                     It takes a "Web Request" (which is just a bunch of text traveling over a wire) and turns it into a Java Method call.
                     It then takes your Java Object and turns it back into JSON text for the other computer to read.
                     Controller should only know how to relay data, never anything else like dealing with entities or DTOs.
+                    It only connects to @Service.
 
-                    @GetMapping equals fetching data.
-                    @PostMapping equals sending data.
-                    @PutMapping equals updating/replacing existing data.
-                    @DeleteMapping equals removing data.
-                    @PatchMapping equals Partial Update, changing just one field.
+                    @GetMapping    → client requests data from the server (read)
+                    @PostMapping   → client sends data to create a new resource
+                    @PutMapping    → client replaces an existing resource entirely
+                    @PatchMapping  → client partially updates an existing resource
+                    @DeleteMapping → client removes a resource
+
+                    @RequestBody tells Spring the data is being received from a JSON, and it automatically parses it into a Java Object.
+                    @PathVariable tells Spring the data is being received from the URL itself and parses it into a normal variable like "Long id"
                 */
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class TaskController {
-    @Autowired
-    private TaskRepository repository;
-    @Autowired
-    private TaskService service;
+    private final TaskService taskService;
 
-    @GetMapping
-    public Task something() {
-        return new Task();
+    @PostMapping("/tasks") // No need to write "createTasks" since "@PostMapping" already tells you what the method does with tasks.
+    public TaskDTO createTask(@RequestBody CreateTaskRequest taskRequest) {
+        return taskService.createTask(taskRequest);
     }
 
-    @GetMapping("/print")
-    public String print() {
-        return service.print();
-    }
-
-    @GetMapping("/allTasks")
-    public List<Task> getAllTasks() {
-        return repository.findAll();
-    }
-
-    @PostMapping("/createTask")
-    public Task createTask(@RequestBody Task task) { /* @RequestBody tells Spring the data is being received from a JSON,
-                                                        and it automatically parses it into a Java Object.             */
-        return repository.save(task);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id) { /* @PathVariable tells Spring the data is being received from the URL
-                                                       itself and parses it into a normal variable like "Long id"      */
-        repository.deleteById(id);
+    @GetMapping("/tasks") // "/tasks" represents
+    public List<TaskDTO> getTasks() {
+        return taskService.getTasks();
     }
 }
