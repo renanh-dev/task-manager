@@ -1,7 +1,7 @@
 package com.example.taskmanager.service;
 
-import com.example.taskmanager.dto.TaskRequest;
-import com.example.taskmanager.dto.TaskDTO;
+import com.example.taskmanager.dto.request.TaskRequest;
+import com.example.taskmanager.dto.response.TaskDTO;
 import com.example.taskmanager.entity.Task;
 import com.example.taskmanager.exception.ResourceNotFoundException;
 import com.example.taskmanager.repository.TaskRepository;
@@ -43,5 +43,13 @@ public class TaskService {
 
     private TaskDTO mapToDTO(Task task) {
         return new TaskDTO(task.getId(), task.getTitle(), task.getDescription(), task.isCompleted());
+    }
+
+    public void updateCompletionStatus(Long id, boolean completed) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
+
+        task.setCompleted(completed);
+        taskRepository.save(task);
     }
 }

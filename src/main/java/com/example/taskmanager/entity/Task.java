@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Table(name = "tasks")
-@NoArgsConstructor // Since it's an entity in the database, JPA requires there to be a public no-args constructor so Hibernate uses it to instantiate objects loading from the database.
+@NoArgsConstructor
 
 public class Task { // You only use the keyword "new" (create objects) for entities and DTOs (Data Transfer Objects) in @Service.
     @Id // This tells Spring Data JPA that the variable "long id" is the primary key identifier of a Task object in the Database.
@@ -26,4 +26,10 @@ public class Task { // You only use the keyword "new" (create objects) for entit
         this.description = description;
         this.completed = false;
     }
+    /*
+       @AllArgsConstructor -> includes id in the constructor, not optimal for this case since it contains logic.
+       @RequiredArgsConstructor -> generates a constructor with final fields, absolutely not optimal for entities.
+       @NoArgsConstructor -> ideal in entities since JPA needs one empty constructor to instantiate objects from DB.
+    */
+
 }

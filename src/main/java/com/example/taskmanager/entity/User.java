@@ -8,7 +8,7 @@ import lombok.Setter;
 @Entity // Data validation should not happen here, @Entity is supposed to be a model for the database.
 @Getter
 @Setter
-@Table(name = "Users")
+@Table(name = "users")
 @NoArgsConstructor
 public class User {
     @Id
@@ -17,4 +17,10 @@ public class User {
     private String username;
     private String password;
     private String role;
+
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
 }

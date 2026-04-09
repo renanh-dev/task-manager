@@ -1,13 +1,11 @@
 package com.example.taskmanager.controller;
 
-import com.example.taskmanager.dto.RegisterRequest;
+import com.example.taskmanager.dto.request.RegisterRequest;
 import com.example.taskmanager.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,7 +19,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@Valid @RequestBody RegisterRequest registerRequest) {
+    public void login(@Valid @RequestBody RegisterRequest registerRequest) { //mudar
         userService.register(registerRequest);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
     }
 }

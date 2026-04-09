@@ -1,0 +1,17 @@
+### Create task
+POST http://localhost:8080/api/tasks
+Content-Type: application/json
+
+{
+  "title": "Wash the car.",
+  "description": "White car, sedan."
+}
+
+### List tasks
+GET http://localhost:8080/api/tasks
+
+### Find by id
+GET http://localhost:8080/api/tasks/1
+
+### Delete
+DELETE http://localhost:8080/api/tasks/1

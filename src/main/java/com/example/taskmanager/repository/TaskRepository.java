@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TaskRepository extends JpaRepository<Task, Long> { // @Repository annotation is NOT necessary in modern Spring.
     /*
-        It is an interface because Spring automatically creates a class in runtime that implements this with the necessary methods filled out.
+        It is an interface because Spring automatically creates a class (or proxy) in runtime that implements this with the necessary methods filled out.
         It extends JpaRepository, when an interface extends another it inherits all method contracts from the parent interface.
 
         You are telling Spring: "Here is my @Entity (Task) and its @Id type (Long). Please generate all the methods containing database logic for me."

@@ -1,6 +1,7 @@
 package com.example.taskmanager.service;
 
-import com.example.taskmanager.dto.RegisterRequest;
+import com.example.taskmanager.dto.request.RegisterRequest;
+import com.example.taskmanager.entity.User;
 import com.example.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,5 +19,9 @@ public class UserService {
 
     public void login(RegisterRequest registerRequest) {
 
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 }

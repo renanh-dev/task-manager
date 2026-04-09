@@ -1,4 +1,4 @@
-package com.example.taskmanager.dto;
+package com.example.taskmanager.dto.response;
 
 public record TaskDTO(
         Long id,

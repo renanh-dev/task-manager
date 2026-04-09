@@ -1,7 +1,7 @@
 package com.example.taskmanager.controller;
 
-import com.example.taskmanager.dto.TaskRequest;
-import com.example.taskmanager.dto.TaskDTO;
+import com.example.taskmanager.dto.request.TaskRequest;
+import com.example.taskmanager.dto.response.TaskDTO;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +30,7 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping // No need to write "createTasks" since "@PostMapping" already tells you what the method does with tasks.
+    //@ResponseBody not needed since it's a @RestController and not @Controller.
     public TaskDTO createTask(@Valid @RequestBody TaskRequest taskRequest) {
         return taskService.createTask(taskRequest);
     }
@@ -44,7 +45,12 @@ public class TaskController {
         return taskService.getTask(id);
     }
 
-    @DeleteMapping
+    @PatchMapping("/{id}/completion")
+    public void updateCompletionStatus(@PathVariable Long id, @RequestParam boolean completed) { // @RequestParam captures query parameters, a field of task here.
+        taskService.updateCompletionStatus(id, completed);
+    }
+
+    @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
     }

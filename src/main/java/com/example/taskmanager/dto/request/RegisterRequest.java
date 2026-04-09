@@ -1,9 +1,9 @@
-package com.example.taskmanager.dto;
+package com.example.taskmanager.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record LoginRequest(
+public record RegisterRequest(
         @NotBlank
         @Size(min = 8)
         String username,
@@ -12,3 +12,5 @@ public record LoginRequest(
         @Size(min = 8)
         String password
 ) {}
+
+// I know they're the same, maybe some difference in future updates?
