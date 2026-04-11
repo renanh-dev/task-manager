@@ -1,7 +1,7 @@
 package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.request.TaskRequest;
-import com.example.taskmanager.dto.response.TaskDTO;
+import com.example.taskmanager.dto.standard.TaskDTO;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

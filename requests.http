@@ -15,3 +15,6 @@ GET http://localhost:8080/api/tasks/1
 
 ### Delete
 DELETE http://localhost:8080/api/tasks/1
+
+### Patch
+PATCH http://localhost:8080/api/tasks/1/completion=?true

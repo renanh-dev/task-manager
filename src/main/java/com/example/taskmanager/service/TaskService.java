@@ -1,7 +1,7 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.request.TaskRequest;
-import com.example.taskmanager.dto.response.TaskDTO;
+import com.example.taskmanager.dto.standard.TaskDTO;
 import com.example.taskmanager.entity.Task;
 import com.example.taskmanager.exception.ResourceNotFoundException;
 import com.example.taskmanager.repository.TaskRepository;

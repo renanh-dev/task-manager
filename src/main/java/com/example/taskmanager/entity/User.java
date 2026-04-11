@@ -1,26 +1,35 @@
 package com.example.taskmanager.entity;
 
+import com.example.taskmanager.enums.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity // Data validation should not happen here, @Entity is supposed to be a model for the database.
+@Entity // Entity validation should not happen here, entity is a table in the database.
+@Table(name = "users")
 @Getter
 @Setter
-@Table(name = "users")
 @NoArgsConstructor
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
-    private String password;
-    private String role;
 
-    public User(String username, String password, String role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-    }
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password; // always stored hashed, never plain
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+
+    @Column(nullable = false)
+    private boolean enabled = true;
 }
