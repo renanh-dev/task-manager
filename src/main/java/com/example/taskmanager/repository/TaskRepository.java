@@ -1,9 +1,14 @@
 package com.example.taskmanager.repository;
 
 import com.example.taskmanager.entity.Task;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TaskRepository extends JpaRepository<Task, Long> { // @Repository annotation is NOT necessary in modern Spring.
+
+    Page<Task> findByOwnerId(Long ownerId, Pageable pageable);
+
     /*
         It is an interface because Spring automatically creates a class (or proxy) in runtime that implements this with the necessary methods filled out.
         It extends JpaRepository, when an interface extends another it inherits all method contracts from the parent interface.

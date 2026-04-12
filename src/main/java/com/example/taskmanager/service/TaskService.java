@@ -1,35 +1,33 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.request.TaskRequest;
-import com.example.taskmanager.dto.standard.TaskDTO;
+import com.example.taskmanager.dto.response.TaskResponse;
 import com.example.taskmanager.entity.Task;
 import com.example.taskmanager.exception.ResourceNotFoundException;
 import com.example.taskmanager.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
 
-    public List<TaskDTO> getTasks() {
-        return taskRepository.findAll()
-                .stream()
-                .map(this::mapToDTO)
-                .toList();
+    public Page<TaskResponse> getTasks(Long ownerId, Pageable pageable) {
+        return taskRepository.findByOwnerId(ownerId, pageable)
+                .map(this::mapToDTO);
     }
 
-    public TaskDTO getTask(Long id) {
+    public TaskResponse getTask(Long id) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
 
         return mapToDTO(task);
     }
 
-    public TaskDTO createTask(TaskRequest taskRequest) {
+    public TaskResponse createTask(TaskRequest taskRequest) {
         Task task = new Task(taskRequest.title(), taskRequest.description());
 
         Task savedTask = taskRepository.save(task); // It returns the complete Task object with an assigned ID.
@@ -39,10 +37,10 @@ public class TaskService {
 
     public void deleteTask(Long id) {
         taskRepository.deleteById(id);
-    }
+    } // probably send a confirmation that it's been deleted.
 
-    private TaskDTO mapToDTO(Task task) {
-        return new TaskDTO(task.getId(), task.getTitle(), task.getDescription(), task.isCompleted());
+    private TaskResponse mapToDTO(Task task) {
+        return new TaskResponse(task.getId(), task.getTitle(), task.getDescription(), task.isCompleted());
     }
 
     public void updateCompletionStatus(Long id, boolean completed) {

@@ -1,13 +1,13 @@
 package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.request.TaskRequest;
-import com.example.taskmanager.dto.standard.TaskDTO;
+import com.example.taskmanager.dto.response.TaskResponse;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController /*
                     It takes a "Web Request" (which is just a bunch of text traveling over a wire) and turns it into a Java Method call.
@@ -31,17 +31,25 @@ public class TaskController {
 
     @PostMapping // No need to write "createTasks" since "@PostMapping" already tells you what the method does with tasks.
     //@ResponseBody not needed since it's a @RestController and not @Controller.
-    public TaskDTO createTask(@Valid @RequestBody TaskRequest taskRequest) {
+    public TaskResponse createTask(@Valid @RequestBody TaskRequest taskRequest) {
         return taskService.createTask(taskRequest);
     }
 
+    /*
+        Pageable = input (what slice of data the client wants: page number, size, sort)
+        Page = output (the results + metadata: total elements, total pages, etc.)
+
+        Standard for any list endpoint that can grow over time.
+    */
+
     @GetMapping
-    public List<TaskDTO> getTasks() {
-        return taskService.getTasks();
+    public Page<TaskResponse> getTasks(Pageable pageable) { // Page for returning, Pageable for requesting.
+        Long ownerId = // get from security once auth is wired.
+        return taskService.getTasks(ownerId, pageable);
     }
 
     @GetMapping("/{id}")
-    public TaskDTO getTask(@PathVariable Long id) {
+    public TaskResponse getTask(@PathVariable Long id) {
         return taskService.getTask(id);
     }
 

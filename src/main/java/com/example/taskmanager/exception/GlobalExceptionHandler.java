@@ -14,11 +14,23 @@ Combination of:
 @ResponseBody       // serialize the return as JSON, opposite of @RequestBody.
 */
 
-public class GlobalExceptionHandler { // You can have multiple @ExceptionHandler annotations for as many methods as you need.
+public class GlobalExceptionHandler { // You can have multiple @ExceptionHandler annotations for as many methods treating exceptions as you need.
 
     @ExceptionHandler(ResourceNotFoundException.class) // Tells Spring to call "handleNotFound()" when it finds an exception of type defined in constructor.
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(ResourceNotFoundException ex) {
         return new ErrorResponse(404, ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleInvalidCredentials(InvalidCredentialsException ex) {
+        return new ErrorResponse(401, ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleGeneric(Exception ex) {
+        return new ErrorResponse(500, "An unexpected error occurred.");
     }
 }

@@ -2,6 +2,7 @@ package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.request.LoginRequest;
 import com.example.taskmanager.dto.request.RegisterRequest;
+import com.example.taskmanager.dto.response.AuthResponse;
 import com.example.taskmanager.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +16,13 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public void register(@Valid @RequestBody RegisterRequest registerRequest) { // @Valid is CRUCIAL for the annotations inside RegisterRequest to work.
-        userService.register(registerRequest);
+    public AuthResponse register(@Valid @RequestBody RegisterRequest request) { // @Valid is CRUCIAL for the annotations inside RegisterRequest to work.
+        return userService.register(request);
     }
 
     @PostMapping("/login")
-    public void login(@Valid @RequestBody LoginRequest loginRequest) { //mudar
-        userService.login(loginRequest);
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) { //mudar
+        return userService.login(request);
     }
 
     @DeleteMapping("/delete/{id}")

@@ -2,6 +2,11 @@ package com.example.taskmanager.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Entity // This tells Spring Data JPA this should be mapped to the Database.
         /* arguably better to use @Getter and @Setter along with @NoArgsConstructor and @AllArgsConstructor because
@@ -16,10 +21,28 @@ public class Task { // You only use the keyword "new" (create objects) for entit
 
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment. Logic for increasing number of IDs.
     @Setter(AccessLevel.NONE)
+    @Column(nullable = false, unique = true)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    /*
+        Many tasks to one user. Fetch type LAZY is standard unless you need EAGER for some reason. Even then it's not recommended.
+        EAGER makes an additional query for the user, which is also bad due to the N+1 problem.
+    */
+    @JoinColumn(name = "user_id", nullable = false)
+    private User owner;
+
+    @Column(nullable = false)
     private String title;
-    private String description;
+
+    @Column(nullable = false)
     private boolean completed;
+
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private Instant createdAt;
+
+    private String description;
 
     public Task(String title, String description) {
         this.title = title;

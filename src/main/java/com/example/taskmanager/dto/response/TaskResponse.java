@@ -1,6 +1,6 @@
-package com.example.taskmanager.dto.standard;
+package com.example.taskmanager.dto.response;
 
-public record TaskDTO(
+public record TaskResponse(
         Long id,
         String title,
         String description,
