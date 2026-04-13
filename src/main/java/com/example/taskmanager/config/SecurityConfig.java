@@ -8,10 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
 @Configuration // Configuration classes are used to declare beans (An object managed by Spring).
 public class SecurityConfig {
 
@@ -27,6 +23,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 );
+
         return http.build();
     }
 }

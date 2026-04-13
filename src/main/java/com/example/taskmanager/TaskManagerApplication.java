@@ -16,7 +16,7 @@ Real systems usually expand this by having all of these:
     -global exception handling
     logging
     API documentation
-    pagination
+    -pagination
     rate limiting
     caching
     metrics

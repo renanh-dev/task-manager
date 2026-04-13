@@ -42,11 +42,13 @@ public class TaskController {
         Standard for any list endpoint that can grow over time.
     */
 
-    @GetMapping
+    /*@GetMapping
     public Page<TaskResponse> getTasks(Pageable pageable) { // Page for returning, Pageable for requesting.
         Long ownerId = // get from security once auth is wired.
         return taskService.getTasks(ownerId, pageable);
     }
+
+*/
 
     @GetMapping("/{id}")
     public TaskResponse getTask(@PathVariable Long id) {
