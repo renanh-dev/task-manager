@@ -1,8 +1,7 @@
 services:
   postgres:
-    image: postgres
-    pull_policy: never
-    container_name: meubanco
+    image: postgres:16
+    container_name: postgresdb
     environment:
       POSTGRES_DB: task-managerdb
       POSTGRES_USER: postgres
@@ -17,7 +16,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/task-managerdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: pass123
     depends_on:
