@@ -51,7 +51,7 @@ public class Task { // You only use the keyword "new" (create objects) for entit
     }
     /*
        @AllArgsConstructor -> includes id in the constructor, not optimal for this case since it contains logic.
-       @RequiredArgsConstructor -> generates a constructor with final fields, absolutely not optimal for entities.
+       @RequiredArgsConstructor -> generates a constructor only including final fields, absolutely not optimal for entities.
        @NoArgsConstructor -> ideal in entities since JPA needs one empty constructor to instantiate objects from DB.
 
        In real world situations builder() is preferred.

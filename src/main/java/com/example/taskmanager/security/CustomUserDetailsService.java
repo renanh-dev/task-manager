@@ -9,12 +9,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomUserDetailsService implements UserDetailsService { // why this?
+public class CustomUserDetailsService implements UserDetailsService {
+    /*
+        This class connects a user from the database and Spring Security's own concept of a user.
+        It takes a user from the database and converts it into a form Spring Security understands.
+    */
 
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException { // making spring security see the user
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .map(user -> org.springframework.security.core.userdetails.User
                         .withUsername(user.getUsername())

@@ -22,3 +22,5 @@ jobs:
         run: ./mvnw clean package -DskipTests
 
         # git push -> reports success or failure in building
+        # this is CI pipeline, it should run the app and test it.
+        # CD is having the app deployed into production (research this)

@@ -24,7 +24,7 @@ import java.util.Date;
         SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
  */
 @Service
-public class JwtService { // This class contains the logic (hence why it's a service) behind the creation and reading of a JSON Web Token.
+public class JwtService { // This class contains the logic (hence why it's a service) behind the creation and reading of a JWT, nothing else like http or spring security.
 
     @Value("${jwt.secret}")
     private String secret;  // injected from application.properties

@@ -56,5 +56,3 @@ public class UserService {
         userRepository.deleteById(id);
     }
 }
-
-// CONTINUE BY USING JWT AS CLAUDE SPECIFIED
