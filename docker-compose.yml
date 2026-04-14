@@ -1,9 +1,9 @@
 services:
   postgres:
     image: postgres:16
-    container_name: postgresdb
+    container_name: postgresdb      # here to name the container itself for docker cli
     environment:
-      POSTGRES_DB: task-managerdb
+      POSTGRES_DB: task-managerdb   # name of the actual database, goes in spring.datasource.url
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pass123
     ports:
@@ -12,15 +12,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   app:
-    build: .                  # builds from Dockerfile
+    build: .
     ports:
       - "8080:8080"
-    environment:
+    environment:   # environment tells the container running the app to use these to connect to DB.
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/task-managerdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: pass123
     depends_on:
-      - postgres              # waits for postgres to start first
+      - postgres
 
 volumes:
   postgres_data:
