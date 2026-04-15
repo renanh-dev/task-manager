@@ -6,7 +6,9 @@ import com.example.taskmanager.dto.response.AuthResponse;
 import com.example.taskmanager.entity.User;
 import com.example.taskmanager.enums.Role;
 import com.example.taskmanager.exception.InvalidCredentialsException;
+import com.example.taskmanager.exception.ResourceNotFoundException;
 import com.example.taskmanager.repository.UserRepository;
+import com.example.taskmanager.security.AuthUtils;
 import com.example.taskmanager.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuthUtils authUtils;
 
     public AuthResponse register(RegisterRequest request) {
 
@@ -54,7 +57,7 @@ public class UserService {
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 
-    public void deleteUser(Long id) { // probably should return some message that it was successful
-        userRepository.deleteById(id);
+    public void deleteOwnUser() {
+        userRepository.delete(authUtils.getCurrentUser());
     }
 }

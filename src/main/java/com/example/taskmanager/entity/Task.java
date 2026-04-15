@@ -5,8 +5,6 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 
 @Entity // This tells Spring Data JPA this should be mapped to the Database.
         /* arguably better to use @Getter and @Setter along with @NoArgsConstructor and @AllArgsConstructor because
@@ -44,9 +42,10 @@ public class Task { // You only use the keyword "new" (create objects) for entit
 
     private String description;
 
-    public Task(String title, String description) {
+    public Task(String title, String description, User owner) {
         this.title = title;
         this.description = description;
+        this.owner = owner;
         this.completed = false;
     }
     /*

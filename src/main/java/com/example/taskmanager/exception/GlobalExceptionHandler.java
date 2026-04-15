@@ -47,4 +47,10 @@ public class GlobalExceptionHandler { // You can have multiple @ExceptionHandler
 
         return new ErrorResponse(400, errorMessage);
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleUnauthorized(UnauthorizedException ex) {
+        return new ErrorResponse(401, ex.getMessage());
+    }
 }

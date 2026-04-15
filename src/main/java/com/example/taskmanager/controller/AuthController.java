@@ -24,9 +24,4 @@ public class AuthController {
     public AuthResponse login(@Valid @RequestBody LoginRequest request) { //mudar
         return userService.login(request);
     }
-
-    @DeleteMapping("/delete/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-    }
 }
