@@ -40,13 +40,14 @@ public class TaskController {
         Page = output (the results + metadata: total elements, total pages, etc.)
 
         Standard for any list endpoint that can grow over time.
-    */
+
 
     @GetMapping
     public Page<TaskResponse> getTasks(Pageable pageable) { // Page for returning, Pageable for requesting.
         Long ownerId = // get from security once auth is wired.
         return taskService.getTasks(ownerId, pageable);
     }
+    */
 
     @GetMapping("/{id}")
     public TaskResponse getTask(@PathVariable Long id) {
@@ -63,3 +64,5 @@ public class TaskController {
         taskService.deleteTask(id);
     }
 }
+
+// add filtering of tasks by conditions

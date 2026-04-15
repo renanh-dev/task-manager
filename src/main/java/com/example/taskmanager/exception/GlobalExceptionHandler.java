@@ -2,6 +2,7 @@ package com.example.taskmanager.exception;
 
 import com.example.taskmanager.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,5 +33,11 @@ public class GlobalExceptionHandler { // You can have multiple @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGeneric(Exception ex) {
         return new ErrorResponse(500, "An unexpected error occurred.");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleArgumentNotValid(Exception ex) {
+        return new ErrorResponse(400, "Wrong username or password.");
     }
 }

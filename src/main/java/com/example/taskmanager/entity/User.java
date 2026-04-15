@@ -4,10 +4,15 @@ import com.example.taskmanager.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity // Entity validation should not happen here, entity is a table in the database.
 @Table(name = "users")
@@ -15,7 +20,7 @@ import java.time.ZonedDateTime;
 @Setter
 @NoArgsConstructor
 
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,6 +44,11 @@ public class User {
 
     @Column(nullable = false)
     private boolean enabled = true;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
 
     @Builder
     public User(String username, String password, String email) {

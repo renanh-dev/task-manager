@@ -27,11 +27,11 @@ public class SecurityConfig { // Here you declare which endpoints are public or 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // make it work with tokens instead of sessions.
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // public endpoint
+                        .requestMatchers("/api/auth/**").permitAll() // public endpoint, so allow all requests.
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter,
