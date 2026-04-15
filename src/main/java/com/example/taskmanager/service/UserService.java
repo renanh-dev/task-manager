@@ -4,6 +4,7 @@ import com.example.taskmanager.dto.request.LoginRequest;
 import com.example.taskmanager.dto.request.RegisterRequest;
 import com.example.taskmanager.dto.response.AuthResponse;
 import com.example.taskmanager.entity.User;
+import com.example.taskmanager.enums.Role;
 import com.example.taskmanager.exception.InvalidCredentialsException;
 import com.example.taskmanager.repository.UserRepository;
 import com.example.taskmanager.security.JwtService;
@@ -32,6 +33,7 @@ public class UserService {
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
                 .email(request.email())
+                .role(Role.USER)
                 .build();
 
         userRepository.save(user);

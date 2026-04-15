@@ -36,7 +36,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER;
+    private Role role;
 
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
@@ -51,9 +51,10 @@ public class User implements UserDetails {
     }
 
     @Builder
-    public User(String username, String password, String email) {
+    public User(String username, String password, String email, Role role) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = role;
     }
 }

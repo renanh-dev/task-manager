@@ -37,7 +37,14 @@ public class GlobalExceptionHandler { // You can have multiple @ExceptionHandler
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleArgumentNotValid(Exception ex) {
-        return new ErrorResponse(400, "Wrong username or password.");
+    public ErrorResponse handleArgumentNotValid(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .reduce((first, second) -> first + ": " + second)
+                .orElse("Validation failed.");
+
+        return new ErrorResponse(400, errorMessage);
     }
 }

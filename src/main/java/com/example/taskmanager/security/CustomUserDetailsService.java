@@ -1,5 +1,7 @@
 package com.example.taskmanager.security;
 
+import ch.qos.logback.classic.Logger;
+import com.example.taskmanager.exception.GlobalExceptionHandler;
 import com.example.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,13 +22,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .map(user -> org.springframework.security.core.userdetails.User
-                        .withUsername(user.getUsername())
-                        .password(user.getPassword())
-                        .roles(user.getRole().name())
-                        .disabled(!user.isEnabled())
-                        .build()
-                )
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 }

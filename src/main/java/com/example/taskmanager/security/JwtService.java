@@ -37,7 +37,7 @@ public class JwtService { // This class contains the logic (hence why it's a ser
     public String generateToken(User user) {
         return Jwts.builder()
                 .subject(user.getUsername())                // who this token belongs to (subject)
-                .claim("role", user.getRole())        // extra data you want to embed (claim)
+                .claim("role", user.getRole().name())        // extra data you want to embed (claim)
                 .issuedAt(new Date())                       // when it was created (issuedAt)
                 .expiration(new Date(System.currentTimeMillis() + expiration))  // when the token expires (expiration)
                 .signWith(getSigningKey())                  // sign it with the secret key (in application.properties)
