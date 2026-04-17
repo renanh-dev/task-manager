@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +28,7 @@ public class SecurityConfig { // Here you declare which endpoints are public or 
         http
                 .csrf(csrf -> csrf.disable()) // jwt is stateless, no csrf protection needed.
                 .sessionManagement(s -> s
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // make it work with tokens instead of sessions.
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // working with tokens instead of sessions.
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // public endpoint, so allow all requests.
                         .anyRequest().authenticated()
