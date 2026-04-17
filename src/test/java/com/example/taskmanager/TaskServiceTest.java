@@ -22,7 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskServiceTest {
@@ -96,6 +96,73 @@ public class TaskServiceTest {
             setField(saved, "id", 20L);
             return saved;
         });
+
+        TaskResponse response = taskService.createTask(request);
+
+        assertThat(response.title()).isEqualTo("something");
+        assertThat(response.description()).isEqualTo("nothing");
+        assertThat(response.completed()).isFalse();
+
+        verify(taskRepository, times(1)).save(any(Task.class));
+        // verifies save() was called exactly once.
+    }
+
+    // - deleteTask -
+
+    @Test
+    void deleteTask_deletesSuccessfully_whenUserMatches() {
+        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+        when(authUtils.getCurrentUser()).thenReturn(owner);
+
+        taskService.deleteTask(10L);
+
+        verify(taskRepository).deleteById(10L);
+    }
+
+    @Test
+    void deleteTask_throwsUnauthorized_andNeverDeletes_whenWrongUser() {
+        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+        when(authUtils.getCurrentUser()).thenReturn(otherUser);
+
+        taskService.deleteTask(10L);
+
+        assertThatThrownBy(() -> taskService.deleteTask(10L))
+                .isInstanceOf(UnauthorizedException.class);
+    }
+
+    @Test
+    void deleteTask_throwsNotFound_whenTaskDoesNotExist() {
+        when(taskRepository.findById(99L)).thenReturn(Optional.empty());
+
+        taskService.deleteTask(99L);
+
+        assertThatThrownBy(() -> taskService.deleteTask(99L))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    // - updateCompletionStatus -
+
+    @Test
+    void updateCompletionStatus_marksTaskComplete() {
+        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+        when(authUtils.getCurrentUser()).thenReturn(owner);
+        when(taskRepository.save(task)).thenReturn(task);
+
+        TaskResponse response = taskService.updateCompletionStatus(10L, true);
+
+        assertThat(response.completed()).isTrue();
+        verify(taskRepository).save(task);
+    }
+
+    @Test
+    void updateCompletionStatus_throwsUnauthorized_whenWrongUser() {
+        when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
+        when(authUtils.getCurrentUser()).thenReturn(otherUser);
+
+        assertThatThrownBy(() -> taskService.updateCompletionStatus(10L, true))
+                .isInstanceOf(UnauthorizedException.class);
+
+        verify(taskRepository, never()).save(any());
     }
 
     // - Helpers -
