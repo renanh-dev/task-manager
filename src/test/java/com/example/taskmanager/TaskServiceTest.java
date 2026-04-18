@@ -23,6 +23,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskServiceTest {
@@ -124,8 +125,6 @@ public class TaskServiceTest {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
         when(authUtils.getCurrentUser()).thenReturn(otherUser);
 
-        taskService.deleteTask(10L);
-
         assertThatThrownBy(() -> taskService.deleteTask(10L))
                 .isInstanceOf(UnauthorizedException.class);
     }
@@ -133,8 +132,6 @@ public class TaskServiceTest {
     @Test
     void deleteTask_throwsNotFound_whenTaskDoesNotExist() {
         when(taskRepository.findById(99L)).thenReturn(Optional.empty());
-
-        taskService.deleteTask(99L);
 
         assertThatThrownBy(() -> taskService.deleteTask(99L))
                 .isInstanceOf(ResourceNotFoundException.class);
@@ -178,14 +175,6 @@ public class TaskServiceTest {
         setField(u, "id", id);
         return u;
     }
-
-    private void setField(Object target, String fieldName, Object value) {
-        try {
-            var field = target.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            field.set(target, value);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not set field " + fieldName, e);
-        }
-    } // try catch is fine for helpers
 }
+
+// try catch is fine for helpers
