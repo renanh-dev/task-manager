@@ -1,4 +1,4 @@
-package com.example.taskmanager;
+package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.request.TaskRequest;
 import com.example.taskmanager.dto.response.TaskResponse;
@@ -9,7 +9,6 @@ import com.example.taskmanager.exception.ResourceNotFoundException;
 import com.example.taskmanager.exception.UnauthorizedException;
 import com.example.taskmanager.repository.TaskRepository;
 import com.example.taskmanager.security.AuthUtils;
-import com.example.taskmanager.service.TaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

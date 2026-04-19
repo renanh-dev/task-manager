@@ -6,7 +6,6 @@ import com.example.taskmanager.dto.response.AuthResponse;
 import com.example.taskmanager.entity.User;
 import com.example.taskmanager.enums.Role;
 import com.example.taskmanager.exception.InvalidCredentialsException;
-import com.example.taskmanager.exception.ResourceNotFoundException;
 import com.example.taskmanager.repository.UserRepository;
 import com.example.taskmanager.security.AuthUtils;
 import com.example.taskmanager.security.JwtService;
@@ -29,7 +28,7 @@ public class UserService {
         }
 
         if (userRepository.existsByEmail(request.email())) {
-            throw new InvalidCredentialsException("Email already registered.");
+            throw new InvalidCredentialsException("Email is already taken.");
         }
 
         User user = User.builder()
