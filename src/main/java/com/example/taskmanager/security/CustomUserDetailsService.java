@@ -1,7 +1,5 @@
 package com.example.taskmanager.security;
 
-import ch.qos.logback.classic.Logger;
-import com.example.taskmanager.exception.GlobalExceptionHandler;
 import com.example.taskmanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,3 +23,5 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 }
+
+// UsernameNotFoundException needed since Spring Security catches it specifically.
