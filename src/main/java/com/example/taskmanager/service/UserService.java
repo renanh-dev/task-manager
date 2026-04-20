@@ -12,6 +12,7 @@ import com.example.taskmanager.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthUtils authUtils;
 
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByUsername(request.username())) {
@@ -44,6 +46,7 @@ public class UserService {
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.username())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials."));
@@ -56,6 +59,7 @@ public class UserService {
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 
+    @Transactional
     public void deleteOwnUser() {
         userRepository.delete(authUtils.getCurrentUser());
     }
