@@ -5,6 +5,7 @@ import com.example.taskmanager.dto.response.TaskResponse;
 import com.example.taskmanager.entity.Task;
 import com.example.taskmanager.entity.User;
 import com.example.taskmanager.enums.Role;
+import com.example.taskmanager.enums.TaskStatus;
 import com.example.taskmanager.exception.ResourceNotFoundException;
 import com.example.taskmanager.exception.UnauthorizedException;
 import com.example.taskmanager.repository.TaskRepository;
@@ -63,7 +64,7 @@ public class TaskServiceTest {
         // assert - verify result
         assertThat(response.id()).isEqualTo(10L);
         assertThat(response.title()).isEqualTo("Write tests");
-        assertThat(response.completed()).isFalse();
+        assertThat(response.status()).isEqualTo(TaskStatus.TODO);
     }
 
     @Test
@@ -101,7 +102,7 @@ public class TaskServiceTest {
 
         assertThat(response.title()).isEqualTo("something");
         assertThat(response.description()).isEqualTo("nothing");
-        assertThat(response.completed()).isFalse();
+        assertThat(response.status()).isEqualTo(TaskStatus.TODO);
 
         verify(taskRepository, times(1)).save(any(Task.class));
         // verifies save() was called exactly once.
@@ -144,9 +145,9 @@ public class TaskServiceTest {
         when(authUtils.getCurrentUser()).thenReturn(owner);
         when(taskRepository.save(task)).thenReturn(task);
 
-        TaskResponse response = taskService.updateCompletionStatus(10L, true);
+        TaskResponse response = taskService.updateCompletionStatus(10L, TaskStatus.IN_PROGRESS);
 
-        assertThat(response.completed()).isTrue();
+        assertThat(response.status()).isEqualTo(TaskStatus.IN_PROGRESS);
         verify(taskRepository).save(task);
     }
 
@@ -155,7 +156,7 @@ public class TaskServiceTest {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
         when(authUtils.getCurrentUser()).thenReturn(otherUser);
 
-        assertThatThrownBy(() -> taskService.updateCompletionStatus(10L, true))
+        assertThatThrownBy(() -> taskService.updateCompletionStatus(10L, TaskStatus.IN_PROGRESS))
                 .isInstanceOf(UnauthorizedException.class);
 
         verify(taskRepository, never()).save(any());

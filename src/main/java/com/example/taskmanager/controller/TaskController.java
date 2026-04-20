@@ -2,6 +2,7 @@ package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.request.TaskRequest;
 import com.example.taskmanager.dto.response.TaskResponse;
+import com.example.taskmanager.enums.TaskStatus;
 import com.example.taskmanager.security.AuthUtils;
 import com.example.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
@@ -46,7 +47,6 @@ public class TaskController {
         Standard for any list endpoint that can grow over time.
     */
 
-
     @GetMapping
     public Page<TaskResponse> getTasks(Pageable pageable) { // Page for returning, Pageable for requesting.
         Long ownerId = authUtils.getCurrentUser().getId();
@@ -59,8 +59,8 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/completion")
-    public TaskResponse updateCompletionStatus(@PathVariable Long id, @RequestParam boolean completed) { // @RequestParam captures query parameters, a field of task here.
-        return taskService.updateCompletionStatus(id, completed);
+    public TaskResponse updateCompletionStatus(@PathVariable Long id, @RequestParam TaskStatus status) { // @RequestParam captures query parameters, a field of task here.
+        return taskService.updateCompletionStatus(id, status);
     }
 
     @DeleteMapping("/{id}")

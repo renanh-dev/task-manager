@@ -1,8 +1,13 @@
 package com.example.taskmanager.entity;
 
+import com.example.taskmanager.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 
@@ -10,10 +15,12 @@ import java.time.Instant;
         /* arguably better to use @Getter and @Setter along with @NoArgsConstructor and @AllArgsConstructor because
          of hashCode() and equals() causing issues with Database relationships */
 @Getter
-@Setter
+@Setter(AccessLevel.PRIVATE)
 @Table(name = "tasks")
+@SoftDelete(strategy = SoftDeleteType.DELETED) // Soft deleting is standard.
 @NoArgsConstructor
 
+@EntityListeners(AuditingEntityListener.class)
 public class Task { // You only use the keyword "new" (create objects) for entities and DTOs (Data Transfer Objects) in @Service.
     @Id // This tells Spring Data JPA that the variable "long id" is the primary key identifier of a Task object in the Database.
 
@@ -33,21 +40,34 @@ public class Task { // You only use the keyword "new" (create objects) for entit
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    private boolean completed;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "task_status", nullable = false)
+    private TaskStatus task_status;
 
-    @Column(nullable = false, updatable = false)
-    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreatedDate
     private Instant createdAt;
 
+    @Column(name = "updated_at")
+    @LastModifiedDate
+    private Instant updatedAt;
+
     private String description;
+
+    @Version // solves concurrency problems
+    private Long version;
 
     public Task(String title, String description, User owner) {
         this.title = title;
         this.description = description;
         this.owner = owner;
-        this.completed = false;
+        this.task_status = TaskStatus.TODO;
     }
+
+    public void markStatus(TaskStatus s) {
+        setTask_status(s); // change this to check if transition is possible
+    }
+
     /*
        @AllArgsConstructor -> includes id in the constructor, not optimal for this case since it contains logic.
        @RequiredArgsConstructor -> generates a constructor only including final fields, absolutely not optimal for entities.

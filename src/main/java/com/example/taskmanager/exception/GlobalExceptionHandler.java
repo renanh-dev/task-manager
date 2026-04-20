@@ -42,7 +42,7 @@ public class GlobalExceptionHandler { // You can have multiple @ExceptionHandler
                 .getFieldErrors()
                 .stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .reduce((first, second) -> first + ": " + second)
+                .reduce((first, second) -> first + ", " + second)
                 .orElse("Validation failed.");
 
         return new ErrorResponse(400, errorMessage);
