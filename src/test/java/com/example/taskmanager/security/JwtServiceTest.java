@@ -12,11 +12,12 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 public class JwtServiceTest {
     private JwtService jwtService;
-    private String SECRET = "dGVzdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3Nlc09ubHkxMjM0NTY3ODk=";
+    private static final String SECRET = "dGVzdFNlY3JldEtleUZvclRlc3RpbmdQdXJwb3Nlc09ubHkxMjM0NTY3ODk=";
     private User testUser;
 
     @BeforeEach
     void setUp() {
+        jwtService = new JwtService();
         setField(jwtService, "SECRET", SECRET);
 
         testUser = User.builder()

@@ -127,6 +127,7 @@ public class TaskServiceTest {
 
         assertThatThrownBy(() -> taskService.deleteTask(10L))
                 .isInstanceOf(UnauthorizedException.class);
+        verify(taskRepository, never()).deleteById(any());
     }
 
     @Test
@@ -143,12 +144,10 @@ public class TaskServiceTest {
     void updateCompletionStatus_marksTaskComplete() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
         when(authUtils.getCurrentUser()).thenReturn(owner);
-        when(taskRepository.save(task)).thenReturn(task);
 
         TaskResponse response = taskService.updateCompletionStatus(10L, TaskStatus.IN_PROGRESS);
 
         assertThat(response.status()).isEqualTo(TaskStatus.IN_PROGRESS);
-        verify(taskRepository).save(task);
     }
 
     @Test

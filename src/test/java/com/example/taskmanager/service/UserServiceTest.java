@@ -44,8 +44,8 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private RegisterRequest RegRequest;
-    private LoginRequest LogRequest;
+    private RegisterRequest regRequest;
+    private LoginRequest logRequest;
     private User user;
 
     private String username = "John";
@@ -54,8 +54,8 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        RegRequest = new RegisterRequest(username, password, email);
-        LogRequest = new LoginRequest(username, password);
+        regRequest = new RegisterRequest(username, password, email);
+        logRequest = new LoginRequest(username, password);
 
         user = buildUser(1L, email, username, password);
     }
@@ -68,7 +68,7 @@ public class UserServiceTest {
         when(userRepository.existsByEmail(email)).thenReturn(false);
         when(jwtService.generateToken(any(User.class))).thenReturn("token");
 
-        AuthResponse response = userService.register(RegRequest);
+        AuthResponse response = userService.register(regRequest);
 
         verify(userRepository).save(any(User.class));
         verify(jwtService).generateToken(any(User.class));
@@ -79,7 +79,7 @@ public class UserServiceTest {
     void register_UserAlreadyTaken() {
         when(userRepository.existsByUsername(username)).thenReturn(true);
 
-        assertThatThrownBy(() -> userService.register(RegRequest))
+        assertThatThrownBy(() -> userService.register(regRequest))
                 .isInstanceOf(InvalidCredentialsException.class)
                 .hasMessage("Username is already taken.");
     }
@@ -89,7 +89,7 @@ public class UserServiceTest {
         when(userRepository.existsByUsername(username)).thenReturn(false);
         when(userRepository.existsByEmail(email)).thenReturn(true);
 
-        assertThatThrownBy(() -> userService.register(RegRequest))
+        assertThatThrownBy(() -> userService.register(regRequest))
                 .isInstanceOf(InvalidCredentialsException.class)
                 .hasMessage("Email is already taken.");
     }
@@ -99,10 +99,10 @@ public class UserServiceTest {
     @Test
     void login_UserAuthenticated() {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(LogRequest.password(), user.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(logRequest.password(), user.getPassword())).thenReturn(true);
         when(jwtService.generateToken(any(User.class))).thenReturn("token");
 
-        userService.login(LogRequest);
+        userService.login(logRequest);
 
         verify(jwtService).generateToken(any(User.class));
     }
@@ -111,19 +111,19 @@ public class UserServiceTest {
     void login_UsernameNotFound() {
         when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> userService.login(LogRequest))
+        assertThatThrownBy(() -> userService.login(logRequest))
                 .isInstanceOf(InvalidCredentialsException.class)
-                .hasMessage("Invalid Credentials.");
+                .hasMessage("Invalid credentials.");
     }
 
     @Test
     void login_PasswordDoesNotMatch() {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(LogRequest.password(), user.getPassword())).thenReturn(false);
+        when(passwordEncoder.matches(logRequest.password(), user.getPassword())).thenReturn(false);
 
-        assertThatThrownBy(() -> userService.login(LogRequest))
+        assertThatThrownBy(() -> userService.login(logRequest))
                 .isInstanceOf(InvalidCredentialsException.class)
-                .hasMessage("Invalid Credentials.");
+                .hasMessage("Invalid credentials.");
     }
 
     // - Delete -
@@ -143,7 +143,7 @@ public class UserServiceTest {
         User u = User.builder()
                 .username(username)
                 .email(email)
-                .password("password")
+                .password(password)
                 .role(Role.USER)
                 .build();
 

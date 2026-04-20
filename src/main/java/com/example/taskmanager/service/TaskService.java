@@ -31,7 +31,7 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
 
-        if (validateOwnership(task))
+        if (!validateOwnership(task))
             throw new UnauthorizedException("Could not get task: Access denied.");
 
         return mapToDTO(task);
@@ -49,7 +49,7 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
 
-        if (validateOwnership(task)) {
+        if (!validateOwnership(task)) {
             throw new UnauthorizedException("Could not delete task: Access denied.");
         }
 
@@ -65,7 +65,7 @@ public class TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
 
-        if (validateOwnership(task))
+        if (!validateOwnership(task))
             throw new UnauthorizedException("Could not update task: Access denied.");
 
         task.markStatus(status);
@@ -74,6 +74,6 @@ public class TaskService {
     }
 
     private boolean validateOwnership(Task task) {
-        return !task.getOwner().getId().equals(authUtils.getCurrentUser().getId());
+        return task.getOwner().getId().equals(authUtils.getCurrentUser().getId());
     }
 }
