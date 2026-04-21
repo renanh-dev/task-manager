@@ -2,6 +2,8 @@ package com.example.taskmanager.exception;
 
 import com.example.taskmanager.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -52,5 +54,17 @@ public class GlobalExceptionHandler { // You can have multiple @ExceptionHandler
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleUnauthorized(UnauthorizedException ex) {
         return new ErrorResponse(401, ex.getMessage());
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOptimisticLock(ObjectOptimisticLockingFailureException ex) {
+        return new ErrorResponse(409, "Resource was modified by another request. Please retry.");
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMalformedJson(HttpMessageNotReadableException ex) {
+        return new ErrorResponse(400, "Malformed JSON request.");
     }
 }

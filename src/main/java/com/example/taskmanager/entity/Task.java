@@ -78,5 +78,4 @@ public class Task { // You only use the keyword "new" (create objects) for entit
 
 }
 
-// fix flyway schema
 // indexing necessary for querying
