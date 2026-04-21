@@ -57,7 +57,7 @@ public class TaskService {
     }
 
     private TaskResponse mapToDTO(Task task) {
-        return new TaskResponse(task.getId(), task.getTitle(), task.getDescription(), task.getTask_status());
+        return new TaskResponse(task.getId(), task.getTitle(), task.getDescription(), task.getTaskStatus());
     }
 
     @Transactional // No need to run "save()" if a task is loaded from repository.

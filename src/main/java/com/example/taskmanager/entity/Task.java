@@ -42,7 +42,7 @@ public class Task { // You only use the keyword "new" (create objects) for entit
 
     @Enumerated(EnumType.STRING)
     @Column(name = "task_status", nullable = false)
-    private TaskStatus task_status;
+    private TaskStatus taskStatus;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreatedDate
@@ -61,11 +61,11 @@ public class Task { // You only use the keyword "new" (create objects) for entit
         this.title = title;
         this.description = description;
         this.owner = owner;
-        this.task_status = TaskStatus.TODO;
+        this.taskStatus = TaskStatus.TODO;
     }
 
     public void markStatus(TaskStatus s) {
-        setTask_status(s); // change this to check if transition is possible
+        setTaskStatus(s); // change this to check if transition is possible
     }
 
     /*
@@ -77,3 +77,6 @@ public class Task { // You only use the keyword "new" (create objects) for entit
     */
 
 }
+
+// fix flyway schema
+// indexing necessary for querying

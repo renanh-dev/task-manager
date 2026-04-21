@@ -1,0 +1,13 @@
+ALTER TABLE tasks
+    ADD COLUMN deleted     BOOLEAN                     NOT NULL DEFAULT FALSE,
+    ADD COLUMN task_status VARCHAR(255)                NOT NULL DEFAULT 'TODO',
+    ADD COLUMN updated_at  TIMESTAMP WITHOUT TIME ZONE,
+    ADD COLUMN version     BIGINT;
+
+ALTER TABLE users
+    ADD COLUMN version BIGINT;
+
+ALTER TABLE tasks ALTER COLUMN deleted     DROP DEFAULT;
+ALTER TABLE tasks ALTER COLUMN task_status DROP DEFAULT;
+
+ALTER TABLE tasks DROP COLUMN completed;
