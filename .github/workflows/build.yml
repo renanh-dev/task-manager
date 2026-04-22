@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: ./mvnw clean package -DskipTests
+        run: ./mvnw verify
 
         # git push -> reports success or failure in building
         # this is CI pipeline, it should run the app and test it.

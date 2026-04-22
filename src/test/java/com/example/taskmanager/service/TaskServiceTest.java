@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -111,13 +112,14 @@ public class TaskServiceTest {
     // - deleteTask -
 
     @Test
-    void deleteTask_deletesSuccessfully_whenUserMatches() {
+    void deleteTask_softDeletesSuccessfully_whenUserMatches() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
         when(authUtils.getCurrentUser()).thenReturn(owner);
 
         taskService.deleteTask(10L);
 
-        verify(taskRepository).deleteById(10L);
+        verify(taskRepository).save(task);
+        assertThat(task.getDeletedAt()).isNotNull();
     }
 
     @Test

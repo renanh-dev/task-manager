@@ -64,6 +64,7 @@ public class UserService {
         User user = authUtils.getCurrentUser();
 
         user.softDelete();
+
         userRepository.save(user);
     }
 }

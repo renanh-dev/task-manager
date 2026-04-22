@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -134,7 +135,8 @@ public class UserServiceTest {
 
         userService.deleteOwnUser();
 
-        verify(userRepository).delete(user);
+        verify(userRepository).save(user);
+        assertThat(user.getDeletedAt()).isNotNull();
     }
 
     // - Helpers -

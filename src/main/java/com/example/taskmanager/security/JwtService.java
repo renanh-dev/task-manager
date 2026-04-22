@@ -45,8 +45,12 @@ public class JwtService { // This class contains the logic (hence why it's a ser
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        try {
+            final String username = extractUsername(token);
+            return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public String extractUsername(String token) {

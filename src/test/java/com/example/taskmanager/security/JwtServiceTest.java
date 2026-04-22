@@ -4,7 +4,7 @@ import com.example.taskmanager.entity.User;
 import com.example.taskmanager.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,7 +18,8 @@ public class JwtServiceTest {
     @BeforeEach
     void setUp() {
         jwtService = new JwtService();
-        setField(jwtService, "SECRET", SECRET);
+        setField(jwtService, "secret", SECRET);
+        setField(jwtService, "expiration", 84600000L);
 
         testUser = User.builder()
                 .username("John")
@@ -66,7 +67,7 @@ public class JwtServiceTest {
 
     @Test
     void isTokenValid_returnsFalse_forExpiredToken() {
-        setField(jwtService, "expiration", -1000L); // token is born expired for testing.
+        setField(jwtService, "expiration", 0L); // token is born expired for testing.
 
         String expiredToken = jwtService.generateToken(testUser);
 

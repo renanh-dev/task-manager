@@ -54,6 +54,7 @@ public class TaskService {
         }
 
         task.softDelete();
+        taskRepository.save(task);
     }
 
     private TaskResponse mapToDTO(Task task) {
