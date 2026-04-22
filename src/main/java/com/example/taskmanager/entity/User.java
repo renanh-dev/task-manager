@@ -3,6 +3,7 @@ package com.example.taskmanager.entity;
 import com.example.taskmanager.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,7 +20,7 @@ import java.util.List;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor
-
+@SQLRestriction("deleted_at IS NULL")
 @EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
     @Id
@@ -43,8 +44,8 @@ public class User implements UserDetails {
     @CreatedDate
     private Instant createdAt;
 
-    @Column(nullable = false)
-    private boolean enabled;
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     @Version
     private Long version;
@@ -60,6 +61,9 @@ public class User implements UserDetails {
         this.password = password;
         this.email = email;
         this.role = role;
-        this.enabled = true;
+    }
+
+    public void softDelete() {
+        this.deletedAt = Instant.now();
     }
 }

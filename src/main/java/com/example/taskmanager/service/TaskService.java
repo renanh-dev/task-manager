@@ -53,7 +53,7 @@ public class TaskService {
             throw new UnauthorizedException("Could not delete task: Access denied.");
         }
 
-        taskRepository.deleteById(id);
+        task.softDelete();
     }
 
     private TaskResponse mapToDTO(Task task) {

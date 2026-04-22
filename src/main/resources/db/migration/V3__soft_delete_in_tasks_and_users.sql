@@ -1,0 +1,13 @@
+ALTER TABLE tasks
+    ADD deleted_at TIMESTAMP WITHOUT TIME ZONE;
+
+ALTER TABLE users
+    ADD deleted_at TIMESTAMP WITHOUT TIME ZONE;
+
+ALTER TABLE tasks
+DROP
+COLUMN deleted;
+
+ALTER TABLE users
+DROP
+COLUMN enabled;

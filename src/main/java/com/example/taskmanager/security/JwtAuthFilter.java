@@ -1,5 +1,6 @@
 package com.example.taskmanager.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -33,11 +35,26 @@ public class JwtAuthFilter extends OncePerRequestFilter { // This class acts as 
         }
 
         String token = authHeader.substring(7); // strip "Bearer" from the token.
-        String username = jwtService.extractUsername(token);
+
+        String username;
+
+        try {
+            username = jwtService.extractUsername(token);
+        } catch (JwtException ex) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = null;
+
+            try {
+                userDetails = customUserDetailsService.loadUserByUsername(username);
+            } catch (UsernameNotFoundException ex) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
 
             if (jwtService.isTokenValid(token, userDetails)) {
                 UsernamePasswordAuthenticationToken auth =
@@ -51,6 +68,9 @@ public class JwtAuthFilter extends OncePerRequestFilter { // This class acts as 
                                 .buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(auth); // holds authenticated user.
+            } else {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
         }
         filterChain.doFilter(request, response);

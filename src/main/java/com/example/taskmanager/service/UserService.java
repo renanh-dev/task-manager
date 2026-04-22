@@ -61,6 +61,9 @@ public class UserService {
 
     @Transactional
     public void deleteOwnUser() {
-        userRepository.delete(authUtils.getCurrentUser());
+        User user = authUtils.getCurrentUser();
+
+        user.softDelete();
+        userRepository.save(user);
     }
 }

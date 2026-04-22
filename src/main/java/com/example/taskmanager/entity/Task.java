@@ -3,8 +3,7 @@ package com.example.taskmanager.entity;
 import com.example.taskmanager.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SoftDelete;
-import org.hibernate.annotations.SoftDeleteType;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,9 +16,8 @@ import java.time.Instant;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @Table(name = "tasks")
-@SoftDelete(strategy = SoftDeleteType.DELETED) // Soft deleting is standard.
 @NoArgsConstructor
-
+@SQLRestriction("deleted_at IS NULL") // Hibernate automatically appends this to every query, excludes soft deleted tasks
 @EntityListeners(AuditingEntityListener.class)
 public class Task { // You only use the keyword "new" (create objects) for entities and DTOs (Data Transfer Objects) in @Service.
     @Id // This tells Spring Data JPA that the variable "long id" is the primary key identifier of a Task object in the Database.
@@ -54,6 +52,9 @@ public class Task { // You only use the keyword "new" (create objects) for entit
 
     private String description;
 
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
     @Version // solves concurrency problems
     private Long version;
 
@@ -66,6 +67,10 @@ public class Task { // You only use the keyword "new" (create objects) for entit
 
     public void markStatus(TaskStatus s) {
         setTaskStatus(s); // change this to check if transition is possible
+    }
+
+    public void softDelete() {
+        this.deletedAt = Instant.now();
     }
 
     /*
