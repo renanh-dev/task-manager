@@ -1,6 +1,8 @@
 package com.app.taskmanager.exception;
 
 import com.app.taskmanager.dto.response.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -9,23 +11,27 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFound(ResourceNotFoundException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
         return new ErrorResponse(404, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleInvalidCredentials(InvalidCredentialsException ex) {
+        log.warn("Invalid credentials: {}", ex.getMessage());
         return new ErrorResponse(401, ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGeneric(Exception ex) {
+        log.error("Unhandled exception, requestId={}", MDC.get("requestId"), ex);
         return new ErrorResponse(500, "An unexpected error occurred.");
     }
 

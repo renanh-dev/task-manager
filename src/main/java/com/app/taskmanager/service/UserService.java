@@ -8,7 +8,7 @@ import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.AuthUtils;
-import com.app.taskmanager.security.JwtService;
+import com.app.taskmanager.security.JwtProcessing;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
+    private final JwtProcessing jwtProcessing;
     private final AuthUtils authUtils;
 
     @Transactional
@@ -42,7 +42,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        String token = jwtService.generateToken(user);
+        String token = jwtProcessing.generateToken(user);
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 
@@ -55,7 +55,7 @@ public class UserService {
             throw new InvalidCredentialsException("Invalid credentials.");
         }
 
-        String token = jwtService.generateToken(user);
+        String token = jwtProcessing.generateToken(user);
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 

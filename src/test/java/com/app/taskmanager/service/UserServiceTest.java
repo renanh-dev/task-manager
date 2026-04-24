@@ -8,7 +8,7 @@ import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.AuthUtils;
-import com.app.taskmanager.security.JwtService;
+import com.app.taskmanager.security.JwtProcessing;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private JwtService jwtService;
+    private JwtProcessing jwtProcessing;
 
     @Mock
     private AuthUtils authUtils;
@@ -66,12 +66,12 @@ public class UserServiceTest {
     void register_UserIsCreatedAndSaved() {
         when(userRepository.existsByUsername(username)).thenReturn(false);
         when(userRepository.existsByEmail(email)).thenReturn(false);
-        when(jwtService.generateToken(any(User.class))).thenReturn("token");
+        when(jwtProcessing.generateToken(any(User.class))).thenReturn("token");
 
         AuthResponse response = userService.register(regRequest);
 
         verify(userRepository).save(any(User.class));
-        verify(jwtService).generateToken(any(User.class));
+        verify(jwtProcessing).generateToken(any(User.class));
         assertThat(response.token()).isEqualTo("token");
     }
 
@@ -100,11 +100,11 @@ public class UserServiceTest {
     void login_UserAuthenticated() {
         when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(logRequest.password(), user.getPassword())).thenReturn(true);
-        when(jwtService.generateToken(any(User.class))).thenReturn("token");
+        when(jwtProcessing.generateToken(any(User.class))).thenReturn("token");
 
         userService.login(logRequest);
 
-        verify(jwtService).generateToken(any(User.class));
+        verify(jwtProcessing).generateToken(any(User.class));
     }
 
     @Test

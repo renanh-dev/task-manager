@@ -21,3 +21,13 @@ PATCH http://localhost:8080/api/tasks/1/completion=?true
 
 ### Login
 POST http://localhost:8080/api/auth/login
+
+### Register
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "john",
+    "password": "johnpass",
+    "email": "john@email.com"
+}
