@@ -1,5 +1,39 @@
-<appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
-</appender>
+<configuration>
 
+    <springProfile name="dev">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} [%X{requestId}] - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="com.app.taskmanager" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="prod">
+        <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <includeMdcKeyName>requestId</includeMdcKeyName>
+                <includeMdcKeyName>username</includeMdcKeyName>
+                <includeMdcKeyName>path</includeMdcKeyName>
+                <includeMdcKeyName>method</includeMdcKeyName>
+            </encoder>
+        </appender>
+
+        <logger name="com.app.taskmanager" level="INFO" additivity="false">
+            <appender-ref ref="JSON_CONSOLE"/>
+        </logger>
+
+        <root level="WARN">
+            <appender-ref ref="JSON_CONSOLE"/>
+        </root>
+    </springProfile>
+
+</configuration>
 <!-- Defines where logs go and in what format. -->

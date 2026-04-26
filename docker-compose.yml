@@ -20,12 +20,14 @@ services:
     ports:
       - "8080:8080"
     environment:   # environment tells the container running the app to use these to connect to DB.
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/task-managerdb
       SPRING_DATASOURCE_USERNAME: task-manager-postgresql-db
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
     depends_on:
       - postgres
+      - zipkin
 
 volumes:
   postgres_data:
