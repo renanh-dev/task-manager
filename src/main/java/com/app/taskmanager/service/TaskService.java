@@ -34,11 +34,12 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public TaskResponse getTask(Long id) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
+        Task task = findTaskById(id);
 
-        if (!validateOwnership(task))
+        if (isNotOwner(task)) {
+            log.warn("Unauthorized task access, taskId={}, username={}", id, authUtils.getCurrentUser().getUsername());
             throw new UnauthorizedException("Could not get task: Access denied.");
+        }
 
         return TaskResponse.from(task);
     }
@@ -56,38 +57,51 @@ public class TaskService {
 
         afterCommit(appMetrics::recordTaskCreation);
 
+        log.info("Task created, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
         return TaskResponse.from(task);
     }
 
     @Transactional
     public void deleteTask(Long id) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
+        Task task = findTaskById(id);
 
-        if (!validateOwnership(task)) {
+        if (isNotOwner(task)) {
+            log.warn("Unauthorized task delete, taskId={}, username={}", id, task.getOwner().getUsername());
             throw new UnauthorizedException("Could not delete task: Access denied.");
         }
 
         task.softDelete();
         taskRepository.save(task);
+
+        log.info("Task deleted, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
     }
 
     @Transactional
     public TaskResponse updateCompletionStatus(Long id, TaskStatus status) {
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found."));
+        Task task = findTaskById(id);
 
-        if (!validateOwnership(task))
+        if (isNotOwner(task)) {
+            log.warn("Unauthorized task update, taskId={}, username={}", task.getId(), authUtils.getCurrentUser().getUsername());
             throw new UnauthorizedException("Could not update task: Access denied.");
+        }
 
         task.markStatus(status);
 
         taskRepository.save(task);
 
+        log.info("Task status updated, taskId={}, status={}, owner={}", id, status, task.getOwner().getUsername());
         return TaskResponse.from(task);
     }
 
-    private boolean validateOwnership(Task task) {
+    private boolean isNotOwner(Task task) {
         return task.getOwner().getId().equals(authUtils.getCurrentUser().getId());
+    }
+
+    private Task findTaskById(Long id) {
+        return taskRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Task not found, taskId={}", id);
+                    return new ResourceNotFoundException("Task not found.");
+                });
     }
 }

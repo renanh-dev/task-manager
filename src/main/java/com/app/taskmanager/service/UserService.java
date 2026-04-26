@@ -11,6 +11,7 @@ import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.AuthUtils;
 import com.app.taskmanager.security.JwtProcessing;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static com.app.taskmanager.util.TransactionUtils.afterCommit;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
@@ -30,10 +32,12 @@ public class UserService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByUsername(request.username())) {
+            log.warn("Registration failed, reason=username_taken, username={}", request.username());
             throw new InvalidCredentialsException("Username is already taken.");
         }
 
         if (userRepository.existsByEmail(request.email())) {
+            log.warn("Registration failed, reason=email_taken, email={}", request.email());
             throw new InvalidCredentialsException("Email is already taken.");
         }
 
@@ -50,28 +54,35 @@ public class UserService {
 
         afterCommit(appMetrics::incrementRegistrations);
 
+        log.info("User registered: {}", user.getUsername());
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByUsername(request.username())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials."));
+                .orElseThrow(() -> {
+                    log.warn("Login failed, reason=user_not_found, username={}", request.username());
+                    return new InvalidCredentialsException("Invalid credentials.");
+                });
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            log.warn("Login failed, reason=invalid_password, username={}", request.username());
             throw new InvalidCredentialsException("Invalid credentials.");
         }
 
         String token = jwtProcessing.generateToken(user);
+
+        log.info("User logged in, username={}", user.getUsername());
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 
     @Transactional
     public void deleteOwnUser() {
         User user = authUtils.getCurrentUser();
-
         user.softDelete();
 
         userRepository.save(user);
+        log.info("User deleted, username={}", user.getUsername());
     }
 }
