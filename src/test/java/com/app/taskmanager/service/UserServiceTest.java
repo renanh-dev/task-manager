@@ -6,6 +6,7 @@ import com.app.taskmanager.dto.response.AuthResponse;
 import com.app.taskmanager.entity.User;
 import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
+import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.AuthUtils;
 import com.app.taskmanager.security.JwtProcessing;
@@ -40,6 +41,9 @@ public class UserServiceTest {
 
     @Mock
     private AuthUtils authUtils;
+
+    @Mock
+    private AppMetrics appMetrics;
 
     @InjectMocks
     private UserService userService;

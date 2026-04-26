@@ -8,6 +8,7 @@ import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.enums.TaskStatus;
 import com.app.taskmanager.exception.ResourceNotFoundException;
 import com.app.taskmanager.exception.UnauthorizedException;
+import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.TaskRepository;
 import com.app.taskmanager.security.AuthUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,9 @@ public class TaskServiceTest {
 
     @Mock
     private AuthUtils authUtils;
+
+    @Mock
+    private AppMetrics appMetrics;
 
     @InjectMocks
     private TaskService taskService;
