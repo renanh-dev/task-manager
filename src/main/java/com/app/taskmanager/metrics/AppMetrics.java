@@ -13,7 +13,7 @@ public class AppMetrics {
         registry.counter("app.user.registrations").increment();
     }
 
-    public void recordTaskCreation(String status) {
-        registry.counter("app.task.created", "status", status).increment();
+    public void recordTaskCreation() {
+        registry.counter("app.task.created").increment();
     }
 }

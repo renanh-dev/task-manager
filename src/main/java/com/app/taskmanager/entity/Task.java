@@ -51,11 +51,12 @@ public class Task {
     @Version // solves concurrency problems
     private Long version;
 
-    public Task(String title, String description, User owner) {
+    @Builder
+    public Task(String title, String description, User owner, TaskStatus status) {
         this.title = title;
         this.description = description;
         this.owner = owner;
-        this.taskStatus = TaskStatus.TODO;
+        this.taskStatus = status;
     }
 
     public void markStatus(TaskStatus s) {

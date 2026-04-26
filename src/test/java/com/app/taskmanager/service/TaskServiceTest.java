@@ -46,7 +46,12 @@ public class TaskServiceTest {
         owner = buildUser(1L, "john@email.com", "john");
         otherUser = buildUser(2L, "audrey@email.com", "audrey");
 
-        task = new Task("Write tests", "learn it", owner);
+        task = Task.builder()
+                .title("Write tests")
+                .description("Unit tests")
+                .owner(owner)
+                .status(TaskStatus.TODO)
+                .build();
         setField(task, "id", 10L);
     }
 

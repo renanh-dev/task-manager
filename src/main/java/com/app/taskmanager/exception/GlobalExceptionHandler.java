@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGeneric(Exception ex) {
-        log.error("Unhandled exception, requestId={}", MDC.get("requestId"), ex);
+        log.error("Unhandled exception", ex);
         return new ErrorResponse(500, "An unexpected error occurred.");
     }
 
@@ -45,24 +45,29 @@ public class GlobalExceptionHandler {
                 .reduce((first, second) -> first + ", " + second)
                 .orElse("Validation failed.");
 
+        log.warn("Validation failed: {}", ex.getMessage());
+
         return new ErrorResponse(400, errorMessage);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleUnauthorized(UnauthorizedException ex) {
+        log.warn("Unauthorized access: {}", ex.getMessage());
         return new ErrorResponse(401, ex.getMessage());
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleOptimisticLock(ObjectOptimisticLockingFailureException ex) {
+        log.warn("Optimistic lock: {}", ex.getMessage());
         return new ErrorResponse(409, "Resource was modified by another request. Please retry.");
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMalformedJson(HttpMessageNotReadableException ex) {
+        log.warn("Malformed JSON: {}", ex.getMessage());
         return new ErrorResponse(400, "Malformed JSON request.");
     }
 }

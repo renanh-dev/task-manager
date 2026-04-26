@@ -6,6 +6,7 @@ import com.app.taskmanager.dto.response.AuthResponse;
 import com.app.taskmanager.entity.User;
 import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
+import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.AuthUtils;
 import com.app.taskmanager.security.JwtProcessing;
@@ -21,6 +22,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProcessing jwtProcessing;
     private final AuthUtils authUtils;
+    private final AppMetrics appMetrics;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -43,6 +45,9 @@ public class UserService {
         userRepository.save(user);
 
         String token = jwtProcessing.generateToken(user);
+
+        appMetrics.incrementRegistrations();
+
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
 

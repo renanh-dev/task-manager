@@ -6,6 +6,7 @@ import com.app.taskmanager.entity.Task;
 import com.app.taskmanager.enums.TaskStatus;
 import com.app.taskmanager.exception.ResourceNotFoundException;
 import com.app.taskmanager.exception.UnauthorizedException;
+import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.TaskRepository;
 import com.app.taskmanager.security.AuthUtils;
 import lombok.RequiredArgsConstructor;
@@ -13,17 +14,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
     private final AuthUtils authUtils;
+    private final AppMetrics appMetrics;
 
     @Transactional(readOnly = true)
     public Page<TaskResponse> getTasks(Long ownerId, Pageable pageable) {
         return taskRepository.findByOwnerId(ownerId, pageable)
-                .map(this::mapToDTO);
+                .map(TaskResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -34,14 +38,23 @@ public class TaskService {
         if (!validateOwnership(task))
             throw new UnauthorizedException("Could not get task: Access denied.");
 
-        return mapToDTO(task);
+        return TaskResponse.from(task);
     }
 
     @Transactional
     public TaskResponse createTask(TaskRequest taskRequest) {
-        Task task = new Task(taskRequest.title(), taskRequest.description(), authUtils.getCurrentUser());
+        Task task = Task.builder()
+                .title(taskRequest.title())
+                .description(taskRequest.description())
+                .owner(authUtils.getCurrentUser())
+                .status(TaskStatus.TODO)
+                .build();
 
-        return mapToDTO(taskRepository.save(task));
+        taskRepository.save(task);
+
+        afterCommit(appMetrics::recordTaskCreation);
+
+        return TaskResponse.from(task);
     }
 
     @Transactional
@@ -57,10 +70,6 @@ public class TaskService {
         taskRepository.save(task);
     }
 
-    private TaskResponse mapToDTO(Task task) {
-        return new TaskResponse(task.getId(), task.getTitle(), task.getDescription(), task.getTaskStatus());
-    }
-
     @Transactional
     public TaskResponse updateCompletionStatus(Long id, TaskStatus status) {
         Task task = taskRepository.findById(id)
@@ -71,10 +80,23 @@ public class TaskService {
 
         task.markStatus(status);
 
-        return mapToDTO(taskRepository.save(task));
+        taskRepository.save(task);
+
+        return TaskResponse.from(task);
     }
 
     private boolean validateOwnership(Task task) {
         return task.getOwner().getId().equals(authUtils.getCurrentUser().getId());
+    }
+
+    private void afterCommit(Runnable runnable) {
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        runnable.run();
+                    }
+                }
+        );
     }
 }
