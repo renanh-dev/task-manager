@@ -24,7 +24,7 @@ public class MdcFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
         try {
-            String requestId = UUID.randomUUID().toString().substring(0, 0);
+            String requestId = UUID.randomUUID().toString().substring(0, 8);
             MDC.put("requestId", requestId);
             MDC.put("method", request.getMethod());
             MDC.put("path", request.getRequestURI());
