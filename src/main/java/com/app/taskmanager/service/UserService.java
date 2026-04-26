@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.app.taskmanager.util.TransactionUtils.afterCommit;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -46,7 +48,7 @@ public class UserService {
 
         String token = jwtProcessing.generateToken(user);
 
-        appMetrics.incrementRegistrations();
+        afterCommit(appMetrics::incrementRegistrations);
 
         return new AuthResponse(token, user.getUsername(), user.getRole());
     }
