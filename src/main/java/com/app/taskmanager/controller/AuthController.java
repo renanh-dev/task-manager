@@ -6,6 +6,7 @@ import com.app.taskmanager.dto.response.AuthResponse;
 import com.app.taskmanager.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +16,7 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
         return userService.register(request);
     }
