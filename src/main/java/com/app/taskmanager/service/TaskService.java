@@ -94,7 +94,7 @@ public class TaskService {
     }
 
     private boolean isNotOwner(Task task) {
-        return task.getOwner().getId().equals(authUtils.getCurrentUser().getId());
+        return !task.getOwner().getId().equals(authUtils.getCurrentUser().getId());
     }
 
     private Task findTaskById(Long id) {
