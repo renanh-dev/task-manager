@@ -27,8 +27,8 @@ public class TaskService {
     private final AppMetrics appMetrics;
 
     @Transactional(readOnly = true)
-    public Page<TaskResponse> getTasks(Long ownerId, Pageable pageable) {
-        return taskRepository.findByOwnerId(ownerId, pageable)
+    public Page<TaskResponse> getTasks(Pageable pageable) {
+        return taskRepository.findTasksByOwnerId(authUtils.getCurrentUser().getId(), pageable)
                 .map(TaskResponse::from);
     }
 

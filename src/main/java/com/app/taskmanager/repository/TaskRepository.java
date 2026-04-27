@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository // Not strictly needed for it to function it extends JpaRepository but leave it anyway.
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    Page<Task> findByOwnerId(Long ownerId, Pageable pageable);
+    Page<Task> findTasksByOwnerId(Long ownerId, Pageable pageable);
 }

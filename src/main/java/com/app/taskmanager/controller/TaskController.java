@@ -3,7 +3,6 @@ package com.app.taskmanager.controller;
 import com.app.taskmanager.dto.request.TaskRequest;
 import com.app.taskmanager.dto.response.TaskResponse;
 import com.app.taskmanager.enums.TaskStatus;
-import com.app.taskmanager.security.AuthUtils;
 import com.app.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
-    private final AuthUtils authUtils;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -27,8 +25,7 @@ public class TaskController {
 
     @GetMapping
     public Page<TaskResponse> getTasks(Pageable pageable) { // Page for returning, Pageable for requesting.
-        Long ownerId = authUtils.getCurrentUser().getId();
-        return taskService.getTasks(ownerId, pageable);
+        return taskService.getTasks(pageable);
     }
 
     @GetMapping("/{id}")
