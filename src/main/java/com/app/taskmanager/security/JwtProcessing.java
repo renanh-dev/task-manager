@@ -21,8 +21,6 @@ public class JwtProcessing {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    // - public API of the class -
-
     public String generateToken(User user) {
         return Jwts.builder()
                 .subject(user.getUsername())                // who this token belongs to (subject)

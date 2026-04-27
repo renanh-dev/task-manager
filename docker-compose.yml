@@ -7,9 +7,9 @@ services:
     ports:
       - "5432:5432"
     image: postgres:16
-    container_name: postgresdb      # here to name the container itself for docker cli
+    container_name: postgresdb
     environment:
-      POSTGRES_DB: task-managerdb   # name of the actual database, goes in spring.datasource.url
+      POSTGRES_DB: task-managerdb
       POSTGRES_USER: task-manager-postgresql-db
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
@@ -19,12 +19,23 @@ services:
     build: .
     ports:
       - "8080:8080"
-    environment:   # environment tells the container running the app to use these to connect to DB.
+    environment:
+      # ACTIVE PROFILE
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+
+      # DB CONFIG
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/task-managerdb
       SPRING_DATASOURCE_USERNAME: task-manager-postgresql-db
-      DB_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      # JWT CONFIG
       JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+
+      # ADMIN CREDENTIALS
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD_BCRYPT: ${ADMIN_PASSWORD_BCRYPT}
     depends_on:
       - postgres
       - zipkin
