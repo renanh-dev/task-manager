@@ -1,13 +1,15 @@
 package com.app.taskmanager.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
+import com.app.taskmanager.enums.TaskStatus;
 import jakarta.validation.constraints.Size;
 
-public record TaskRequest(
-        @NotBlank
+public record TaskUpdateRequest(
         @Size(min = 3, max = 100)
         String title,
 
         @Size(max = 500)
-        String description
-) {}
+        String description,
+
+        TaskStatus status
+){
+}

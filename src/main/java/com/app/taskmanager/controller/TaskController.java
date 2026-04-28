@@ -1,8 +1,8 @@
 package com.app.taskmanager.controller;
 
 import com.app.taskmanager.dto.request.TaskRequest;
+import com.app.taskmanager.dto.request.TaskUpdateRequest;
 import com.app.taskmanager.dto.response.TaskResponse;
-import com.app.taskmanager.enums.TaskStatus;
 import com.app.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +33,9 @@ public class TaskController {
         return taskService.getTask(id);
     }
 
-    @PatchMapping("/{id}/completion")
-    public TaskResponse updateCompletionStatus(@PathVariable Long id, @RequestParam TaskStatus status) {
-        return taskService.updateCompletionStatus(id, status);
+    @PatchMapping("/{id}")
+    public TaskResponse taskUpdate(@Valid @RequestBody TaskUpdateRequest taskUpdateRequest, @PathVariable Long id) {
+        return taskService.taskUpdate(taskUpdateRequest, id);
     }
 
     @DeleteMapping("/{id}")

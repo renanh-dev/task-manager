@@ -17,7 +17,14 @@ GET http://localhost:8080/api/tasks/1
 DELETE http://localhost:8080/api/tasks/1
 
 ### Patch
-PATCH http://localhost:8080/api/tasks/1/completion=?true
+PATCH http://localhost:8080/api/tasks/1
+Content-Type: application/json
+
+{
+  "title": "title",
+  "description": "description",
+  "status": "IN_PROGRESS"
+}
 
 ### Login
 POST http://localhost:8080/api/auth/login

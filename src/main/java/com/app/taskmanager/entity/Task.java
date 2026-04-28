@@ -59,7 +59,15 @@ public class Task {
         this.taskStatus = status;
     }
 
-    public void markStatus(TaskStatus s) {
+    public void updateTitle(String title) {
+        setTitle(title);
+    }
+
+    public void updateDescription(String description) {
+        setDescription(description);
+    }
+
+    public void updateStatus(TaskStatus s) {
         setTaskStatus(s);
     }
 

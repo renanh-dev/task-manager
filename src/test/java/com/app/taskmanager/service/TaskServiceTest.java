@@ -1,6 +1,7 @@
 package com.app.taskmanager.service;
 
 import com.app.taskmanager.dto.request.TaskRequest;
+import com.app.taskmanager.dto.request.TaskUpdateRequest;
 import com.app.taskmanager.dto.response.TaskResponse;
 import com.app.taskmanager.entity.Task;
 import com.app.taskmanager.entity.User;
@@ -148,26 +149,28 @@ public class TaskServiceTest {
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
-    // - updateCompletionStatus -
+    // - taskUpdate -
 
     @Test
-    void updateCompletionStatus_changesCompletionStatusSuccessfully() {
+    void taskUpdate_changesCompletionStatusSuccessfully() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
         when(authUtils.getCurrentUser()).thenReturn(owner);
         when(taskRepository.save(task)).thenReturn(task);
 
-        TaskResponse response = taskService.updateCompletionStatus(10L, TaskStatus.IN_PROGRESS);
+        TaskResponse response = taskService.taskUpdate(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L);
 
+        assertThat(response.title()).isEqualTo("title");
+        assertThat(response.description()).isEqualTo("description");
         assertThat(response.status()).isEqualTo(TaskStatus.IN_PROGRESS);
         verify(taskRepository).save(task);
     }
 
     @Test
-    void updateCompletionStatus_throwsUnauthorized_whenWrongUser() {
+    void taskUpdate_throwsUnauthorized_whenWrongUser() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
         when(authUtils.getCurrentUser()).thenReturn(otherUser);
 
-        assertThatThrownBy(() -> taskService.updateCompletionStatus(10L, TaskStatus.IN_PROGRESS))
+        assertThatThrownBy(() -> taskService.taskUpdate(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L))
                 .isInstanceOf(UnauthorizedException.class);
 
         verify(taskRepository, never()).save(any());

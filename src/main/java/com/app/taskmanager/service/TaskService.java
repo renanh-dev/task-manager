@@ -1,6 +1,7 @@
 package com.app.taskmanager.service;
 
 import com.app.taskmanager.dto.request.TaskRequest;
+import com.app.taskmanager.dto.request.TaskUpdateRequest;
 import com.app.taskmanager.dto.response.TaskResponse;
 import com.app.taskmanager.entity.Task;
 import com.app.taskmanager.enums.TaskStatus;
@@ -77,7 +78,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponse updateCompletionStatus(Long id, TaskStatus status) {
+    public TaskResponse taskUpdate(TaskUpdateRequest request, Long id) {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {
@@ -85,11 +86,13 @@ public class TaskService {
             throw new UnauthorizedException("Could not update task: Access denied.");
         }
 
-        task.markStatus(status);
+        if (request.title() != null) task.updateTitle(request.title());
+        if (request.description() != null) task.updateDescription(request.description());
+        if (request.status() != null) task.updateStatus(request.status());
 
         taskRepository.save(task);
 
-        log.info("Task status updated, taskId={}, status={}, owner={}", id, status, task.getOwner().getUsername());
+        log.info("Task updated, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
         return TaskResponse.from(task);
     }
 
