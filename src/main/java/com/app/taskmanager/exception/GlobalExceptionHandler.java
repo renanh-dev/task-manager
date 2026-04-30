@@ -2,7 +2,6 @@ package com.app.taskmanager.exception;
 
 import com.app.taskmanager.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -55,7 +54,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleUnauthorized(UnauthorizedException ex) {
         log.warn("Unauthorized access: {}", ex.getMessage());
-        return new ErrorResponse(401, ex.getMessage());
+        return new ErrorResponse(403, ex.getMessage());
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
