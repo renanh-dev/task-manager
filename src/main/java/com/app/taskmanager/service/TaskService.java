@@ -23,8 +23,11 @@ import static com.app.taskmanager.util.TransactionUtils.afterCommit;
 @Slf4j
 @RequiredArgsConstructor
 public class TaskService {
+
     private final TaskRepository taskRepository;
+
     private final AuthUtils authUtils;
+
     private final AppMetrics appMetrics;
 
     @Transactional(readOnly = true)
