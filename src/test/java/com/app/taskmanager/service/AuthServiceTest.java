@@ -12,7 +12,10 @@ import com.app.taskmanager.security.JwtProcessing;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
@@ -24,11 +27,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
+@ExtendWith(MockitoExtension.class)
 @Slf4j
 public class AuthServiceTest {
-
-    @Mock
-    private AuthService authService;
 
     @Mock
     private UserRepository userRepository;
@@ -41,6 +42,9 @@ public class AuthServiceTest {
 
     @Mock
     private AppMetrics appMetrics;
+
+    @InjectMocks
+    private AuthService authService;
 
     private RegisterRequest regRequest;
     private LoginRequest logRequest;
