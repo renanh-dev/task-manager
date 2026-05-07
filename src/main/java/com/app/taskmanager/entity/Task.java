@@ -48,7 +48,7 @@ public class Task {
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
-    @Version // solves concurrency problems
+    @Version
     private Long version;
 
     @Builder

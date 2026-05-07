@@ -58,7 +58,7 @@ public class TaskService {
 
         afterCommit(appMetrics::recordTaskCreation);
 
-        log.info("Task created, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
+        log.info("Task created, taskId={}, owner={}, createdAt={}", task.getId(), task.getOwner().getUsername(), task.getCreatedAt());
         return TaskResponse.from(task);
     }
 
@@ -92,7 +92,7 @@ public class TaskService {
 
         taskRepository.save(task);
 
-        log.info("Task updated, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
+        log.info("Task updated, taskId={}, owner={}, updatedAt={}", task.getId(), task.getOwner().getUsername(), task.getUpdatedAt());
         return TaskResponse.from(task);
     }
 
