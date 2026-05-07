@@ -1,5 +1,6 @@
 package com.app.taskmanager.controller;
 
+import com.app.taskmanager.dto.response.UserResponse;
 import com.app.taskmanager.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    @GetMapping("/me")
+    public UserResponse getCurrentUser() {
+        return userService.getCurrentUser();
+    }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)

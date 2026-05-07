@@ -85,4 +85,8 @@ public class UserService {
         userRepository.save(user);
         log.info("User deleted, username={}", user.getUsername());
     }
+
+    public UserResponse getCurrentUser() {
+        return UserResponse.from(authUtils.getCurrentUser());
+    }
 }
