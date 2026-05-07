@@ -1,6 +1,7 @@
 package com.app.taskmanager.dto.request;
 
 import com.app.taskmanager.enums.TaskStatus;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Size;
 
 public record TaskUpdateRequest(
@@ -11,5 +12,10 @@ public record TaskUpdateRequest(
         String description,
 
         TaskStatus status
-){
+)
+{
+        @AssertTrue(message = "At least one field must be provided")
+        public boolean isAtLeastOneFieldPresent() {
+                return title != null || description != null || status != null;
+        }
 }
