@@ -8,7 +8,7 @@ import com.app.taskmanager.entity.User;
 import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.enums.TaskStatus;
 import com.app.taskmanager.exception.ResourceNotFoundException;
-import com.app.taskmanager.exception.UnauthorizedException;
+import com.app.taskmanager.exception.ForbiddenException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.TaskRepository;
 import com.app.taskmanager.security.AuthUtils;
@@ -92,7 +92,7 @@ public class TaskServiceTest {
         when(authUtils.getCurrentUser()).thenReturn(otherUser);           // current user logged in is audrey
 
         assertThatThrownBy(() -> taskService.getTask(10L))
-                .isInstanceOf(UnauthorizedException.class);
+                .isInstanceOf(ForbiddenException.class);
     }
 
     // - CreateTask -
@@ -137,7 +137,7 @@ public class TaskServiceTest {
         when(authUtils.getCurrentUser()).thenReturn(otherUser);
 
         assertThatThrownBy(() -> taskService.deleteTask(10L))
-                .isInstanceOf(UnauthorizedException.class);
+                .isInstanceOf(ForbiddenException.class);
         verify(taskRepository, never()).deleteById(any());
     }
 
@@ -171,7 +171,7 @@ public class TaskServiceTest {
         when(authUtils.getCurrentUser()).thenReturn(otherUser);
 
         assertThatThrownBy(() -> taskService.taskUpdate(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L))
-                .isInstanceOf(UnauthorizedException.class);
+                .isInstanceOf(ForbiddenException.class);
 
         verify(taskRepository, never()).save(any());
     }

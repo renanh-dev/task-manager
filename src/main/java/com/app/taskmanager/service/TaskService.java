@@ -6,7 +6,7 @@ import com.app.taskmanager.dto.response.TaskResponse;
 import com.app.taskmanager.entity.Task;
 import com.app.taskmanager.enums.TaskStatus;
 import com.app.taskmanager.exception.ResourceNotFoundException;
-import com.app.taskmanager.exception.UnauthorizedException;
+import com.app.taskmanager.exception.ForbiddenException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.TaskRepository;
 import com.app.taskmanager.security.AuthUtils;
@@ -39,7 +39,7 @@ public class TaskService {
 
         if (isNotOwner(task)) {
             log.warn("Unauthorized task access, taskId={}, username={}", id, authUtils.getCurrentUser().getUsername());
-            throw new UnauthorizedException("Could not get task: Access denied.");
+            throw new ForbiddenException("Could not get task: Access denied.");
         }
 
         return TaskResponse.from(task);
@@ -68,7 +68,7 @@ public class TaskService {
 
         if (isNotOwner(task)) {
             log.warn("Unauthorized task delete, taskId={}, username={}", id, task.getOwner().getUsername());
-            throw new UnauthorizedException("Could not delete task: Access denied.");
+            throw new ForbiddenException("Could not delete task: Access denied.");
         }
 
         task.softDelete();
@@ -83,7 +83,7 @@ public class TaskService {
 
         if (isNotOwner(task)) {
             log.warn("Unauthorized task update, taskId={}, username={}", task.getId(), authUtils.getCurrentUser().getUsername());
-            throw new UnauthorizedException("Could not update task: Access denied.");
+            throw new ForbiddenException("Could not update task: Access denied.");
         }
 
         if (request.title() != null) task.updateTitle(request.title());
