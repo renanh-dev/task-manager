@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.util.List;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,16 +33,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .reduce((first, second) -> first + ", " + second)
-                .orElse("Validation failed.");
+        List<ErrorResponse.FieldError> errors = ex.getBindingResult()
+                .getFieldErrors().stream()
+                .map(e -> new ErrorResponse.FieldError(e.getField(), e.getDefaultMessage()))
+                .toList();
 
-        log.warn("Validation failed: {}", message);
+        log.warn("Validation failed: {}", errors);
 
-        return build(HttpStatus.BAD_REQUEST, message);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.ofErrors(HttpStatus.BAD_REQUEST.value(), errors));
     }
 
     @ExceptionHandler(ForbiddenException.class)
@@ -67,7 +69,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.TOO_MANY_REQUESTS)
                 .header("X-Rate-Limit-Retry-After-Seconds", String.valueOf(ex.getRetryAfterSeconds()))
-                .body(new ErrorResponse(HttpStatus.TOO_MANY_REQUESTS.value(), ex.getMessage()));
+                .body(ErrorResponse.of(HttpStatus.TOO_MANY_REQUESTS.value(), ex.getMessage()));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
@@ -97,6 +99,6 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String message) {
         return ResponseEntity
                 .status(status)
-                .body(new ErrorResponse(status.value(), message));
+                .body(ErrorResponse.of(status.value(), message));
     }
 }
