@@ -62,14 +62,14 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByUsername(request.username())
+        User user = userRepository.findByUsernameOrEmail(request.identifier(), request.identifier())
                 .orElseThrow(() -> {
-                    log.warn("Login failed, reason=user_not_found, username={}", request.username());
+                    log.warn("Login failed, reason=user_not_found, identifier={}", request.identifier());
                     return new InvalidCredentialsException("Invalid credentials.");
                 });
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            log.warn("Login failed, reason=invalid_password, username={}", request.username());
+            log.warn("Login failed, reason=invalid_password, identifier={}", request.identifier());
             throw new InvalidCredentialsException("Invalid credentials.");
         }
 
