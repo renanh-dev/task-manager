@@ -16,9 +16,9 @@ public class TaskManagerApplication {
 /*
     -global exception handling
     -logging
-    API documentation
+    -API documentation
     -pagination
-    rate limiting
+    -rate limiting
     caching
     -metrics
     -monitoring
