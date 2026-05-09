@@ -101,7 +101,7 @@ public class AuthServiceTest {
 
     @Test
     void login_UserAuthenticated() {
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameOrEmail(username, username)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(logRequest.password(), user.getPassword())).thenReturn(true);
         when(jwtProcessing.generateToken(any(User.class))).thenReturn("token");
 
@@ -112,7 +112,7 @@ public class AuthServiceTest {
 
     @Test
     void login_UsernameNotFound() {
-        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        when(userRepository.findByUsernameOrEmail(username, username)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> authService.login(logRequest))
                 .isInstanceOf(InvalidCredentialsException.class)
@@ -121,7 +121,7 @@ public class AuthServiceTest {
 
     @Test
     void login_PasswordDoesNotMatch() {
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameOrEmail(username, username)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(logRequest.password(), user.getPassword())).thenReturn(false);
 
         assertThatThrownBy(() -> authService.login(logRequest))
