@@ -13,14 +13,14 @@ public class RateLimitService {
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
 
-    public Bucket resolveBucket(String ipAddress) {
-        return buckets.computeIfAbsent(ipAddress, this::createNewBucket);
+    public Bucket resolveBucket(String key, int capacity, Duration refill) {
+        return buckets.computeIfAbsent(key, k -> createNewBucket(capacity, refill));
     }
 
-    private Bucket createNewBucket(String ipAddress) {
+    private Bucket createNewBucket(int capacity, Duration refill) {
         Bandwidth limit = Bandwidth.builder()
-                .capacity(10)
-                .refillGreedy(10, Duration.ofMinutes(1))
+                .capacity(capacity)
+                .refillGreedy(capacity, refill)
                 .build();
 
         return Bucket.builder()
