@@ -18,6 +18,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByUsernameOrEmail(String username, String email);
-
-    // use @Query(...) to write SQL for queries (have to test them specifically)
 }

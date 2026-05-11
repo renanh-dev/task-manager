@@ -81,7 +81,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponse taskUpdate(TaskUpdateRequest request, Long id) {
+    public TaskResponse updateTask(TaskUpdateRequest request, Long id) {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {

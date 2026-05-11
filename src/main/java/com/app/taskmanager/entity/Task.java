@@ -75,5 +75,3 @@ public class Task {
         this.deletedAt = Instant.now();
     }
 }
-
-// indexing necessary for querying

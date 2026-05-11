@@ -152,12 +152,12 @@ public class TaskServiceTest {
     // - taskUpdate -
 
     @Test
-    void taskUpdate_changesCompletionStatusSuccessfully() {
+    void updateTask_changesCompletionStatusSuccessfully() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
         when(authUtils.getCurrentUser()).thenReturn(owner);
         when(taskRepository.save(task)).thenReturn(task);
 
-        TaskResponse response = taskService.taskUpdate(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L);
+        TaskResponse response = taskService.updateTask(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L);
 
         assertThat(response.title()).isEqualTo("title");
         assertThat(response.description()).isEqualTo("description");
@@ -166,11 +166,11 @@ public class TaskServiceTest {
     }
 
     @Test
-    void taskUpdate_throwsUnauthorized_whenWrongUser() {
+    void updateTask_throwsUnauthorized_whenWrongUser() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
         when(authUtils.getCurrentUser()).thenReturn(otherUser);
 
-        assertThatThrownBy(() -> taskService.taskUpdate(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L))
+        assertThatThrownBy(() -> taskService.updateTask(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L))
                 .isInstanceOf(ForbiddenException.class);
 
         verify(taskRepository, never()).save(any());
