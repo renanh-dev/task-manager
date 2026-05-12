@@ -6,7 +6,7 @@ import com.app.taskmanager.dto.response.TaskResponse;
 import com.app.taskmanager.entity.Task;
 import com.app.taskmanager.enums.TaskStatus;
 import com.app.taskmanager.exception.ResourceNotFoundException;
-import com.app.taskmanager.exception.UnauthorizedException;
+import com.app.taskmanager.exception.ForbiddenException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.TaskRepository;
 import com.app.taskmanager.security.AuthUtils;
@@ -23,8 +23,11 @@ import static com.app.taskmanager.util.TransactionUtils.afterCommit;
 @Slf4j
 @RequiredArgsConstructor
 public class TaskService {
+
     private final TaskRepository taskRepository;
+
     private final AuthUtils authUtils;
+
     private final AppMetrics appMetrics;
 
     @Transactional(readOnly = true)
@@ -39,7 +42,7 @@ public class TaskService {
 
         if (isNotOwner(task)) {
             log.warn("Unauthorized task access, taskId={}, username={}", id, authUtils.getCurrentUser().getUsername());
-            throw new UnauthorizedException("Could not get task: Access denied.");
+            throw new ForbiddenException("Could not get task: Access denied.");
         }
 
         return TaskResponse.from(task);
@@ -58,7 +61,7 @@ public class TaskService {
 
         afterCommit(appMetrics::recordTaskCreation);
 
-        log.info("Task created, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
+        log.info("Task created, taskId={}, owner={}, createdAt={}", task.getId(), task.getOwner().getUsername(), task.getCreatedAt());
         return TaskResponse.from(task);
     }
 
@@ -68,7 +71,7 @@ public class TaskService {
 
         if (isNotOwner(task)) {
             log.warn("Unauthorized task delete, taskId={}, username={}", id, task.getOwner().getUsername());
-            throw new UnauthorizedException("Could not delete task: Access denied.");
+            throw new ForbiddenException("Could not delete task: Access denied.");
         }
 
         task.softDelete();
@@ -78,12 +81,12 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskResponse taskUpdate(TaskUpdateRequest request, Long id) {
+    public TaskResponse updateTask(TaskUpdateRequest request, Long id) {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {
             log.warn("Unauthorized task update, taskId={}, username={}", task.getId(), authUtils.getCurrentUser().getUsername());
-            throw new UnauthorizedException("Could not update task: Access denied.");
+            throw new ForbiddenException("Could not update task: Access denied.");
         }
 
         if (request.title() != null) task.updateTitle(request.title());
@@ -92,7 +95,7 @@ public class TaskService {
 
         taskRepository.save(task);
 
-        log.info("Task updated, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
+        log.info("Task updated, taskId={}, owner={}, updatedAt={}", task.getId(), task.getOwner().getUsername(), task.getUpdatedAt());
         return TaskResponse.from(task);
     }
 

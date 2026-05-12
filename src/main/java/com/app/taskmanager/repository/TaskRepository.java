@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository // Not strictly needed for it to function it extends JpaRepository but leave it anyway.
+@Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
     Page<Task> findTasksByOwnerId(Long ownerId, Pageable pageable);

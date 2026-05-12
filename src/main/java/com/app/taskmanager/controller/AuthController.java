@@ -3,7 +3,7 @@ package com.app.taskmanager.controller;
 import com.app.taskmanager.dto.request.LoginRequest;
 import com.app.taskmanager.dto.request.RegisterRequest;
 import com.app.taskmanager.dto.response.AuthResponse;
-import com.app.taskmanager.service.UserService;
+import com.app.taskmanager.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
-        return userService.register(request);
+        return authService.register(request);
     }
 
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
-        return userService.login(request);
+        return authService.login(request);
     }
 }

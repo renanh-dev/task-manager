@@ -1,4 +1,4 @@
-package com.app.taskmanager.security;
+package com.app.taskmanager.logging;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -39,9 +39,7 @@ public class MdcFilter extends OncePerRequestFilter {
             response.setHeader("X-Request-ID", requestId);
             chain.doFilter(request, response);
         } finally {
-            MDC.clear(); // critical — threads are reused, stale context leaks otherwise
+            MDC.clear(); // critical - threads are reused, stale context leaks otherwise
         }
     }
 }
-
-// logs include all the above information without any altering of the service code
