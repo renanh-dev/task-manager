@@ -68,7 +68,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource()
                                 .buildDetails(request));
 
-                SecurityContextHolder.getContext().setAuthentication(auth); // holds authenticated user.
+                SecurityContextHolder.getContext().setAuthentication(auth);
+
+                MDC.put("username", username);
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
