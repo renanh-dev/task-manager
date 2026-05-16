@@ -34,7 +34,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(nullable = false)
-    private String password; // always stored hashed, never plain
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

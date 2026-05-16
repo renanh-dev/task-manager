@@ -23,12 +23,12 @@ public class JwtProcessing {
 
     public String generateToken(User user) {
         return Jwts.builder()
-                .subject(user.getUsername())                // who this token belongs to (subject)
-                .claim("role", user.getRole().name())        // extra data you want to embed (claim)
-                .issuedAt(new Date())                       // when it was created (issuedAt)
-                .expiration(new Date(System.currentTimeMillis() + expiration))  // when the token expires (expiration)
-                .signWith(getSigningKey())                  // sign it with the secret key (in application.properties)
-                .compact();                                 // build the final string (the whole token)
+                .subject(user.getUsername())
+                .claim("role", user.getRole().name())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey())
+                .compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

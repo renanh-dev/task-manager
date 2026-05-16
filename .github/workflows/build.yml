@@ -20,7 +20,3 @@ jobs:
 
       - name: Build with Maven
         run: ./mvnw verify
-
-        # git push -> reports success or failure in building
-        # this is CI pipeline, it should run the app and test it.
-        # CD is having the app deployed into production (research this)

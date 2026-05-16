@@ -1,6 +1,5 @@
 package com.app.taskmanager.security;
 
-import com.app.taskmanager.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,9 +26,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // jwt is stateless, no csrf protection needed.
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // working with tokens instead of sessions.
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/auth/**",
@@ -37,7 +36,6 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        .requestMatchers("/actuator/**").hasAuthority(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter,

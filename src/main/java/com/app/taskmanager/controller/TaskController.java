@@ -44,5 +44,3 @@ public class TaskController {
         taskService.deleteTask(id);
     }
 }
-
-// add filtering of tasks by conditions
