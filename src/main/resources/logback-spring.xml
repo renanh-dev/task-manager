@@ -3,7 +3,18 @@
     <springProfile name="dev">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
-                <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} [%X{requestId}] [%X{method} %X{path}] - %msg%n</pattern>
+                <pattern>
+                    %d{HH:mm:ss}
+                    [%thread]
+                    %-5level
+                    %logger{36}
+                    [username:%X{username}]
+                    [req:%X{requestId:-}]
+                    [trace:%X{traceId:-}]
+                    [span:%X{spanId:-}]
+                    [%X{method} %X{path}]
+                    - %msg%n
+                </pattern>
             </encoder>
         </appender>
 
@@ -20,9 +31,9 @@
         <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
                 <includeMdcKeyName>requestId</includeMdcKeyName>
-                <includeMdcKeyName>username</includeMdcKeyName>
-                <includeMdcKeyName>path</includeMdcKeyName>
                 <includeMdcKeyName>method</includeMdcKeyName>
+                <includeMdcKeyName>path</includeMdcKeyName>
+                <includeMdcKeyName>username</includeMdcKeyName>
             </encoder>
         </appender>
 
@@ -36,4 +47,3 @@
     </springProfile>
 
 </configuration>
-<!-- Defines where logs go and in what format. -->
