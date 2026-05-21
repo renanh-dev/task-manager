@@ -94,6 +94,7 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken, user.getUsername(), user.getRole());
     }
 
+    @Transactional
     public AuthResponse refresh(RefreshTokenRequest request) {
         RefreshTokenContext context = refreshTokenService.validateAndRevoke(request.refreshToken());
         String newAccessToken = jwtService.generateToken(context.user());
