@@ -14,7 +14,7 @@ import java.time.Instant;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @Table(name = "tasks")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLRestriction("deleted_at IS NULL") // Hibernate automatically appends this to every query, excludes soft deleted tasks
 @EntityListeners(AuditingEntityListener.class)
 public class Task {
