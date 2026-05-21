@@ -41,7 +41,7 @@ public class TaskService {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {
-            log.warn("Unauthorized task access, taskId={}, username={}", id, authUtils.getCurrentUser().getUsername());
+            log.warn("Unauthorized task access, taskId={}, userId={}", id, authUtils.getCurrentUser().getId());
             throw new ForbiddenException("Could not get task: Access denied.");
         }
 
@@ -61,7 +61,7 @@ public class TaskService {
 
         afterCommit(appMetrics::recordTaskCreation);
 
-        log.info("Task created, taskId={}, owner={}, createdAt={}", task.getId(), task.getOwner().getUsername(), task.getCreatedAt());
+        log.info("Task created, taskId={}, ownerId={}, createdAt={}", task.getId(), task.getOwner().getId(), task.getCreatedAt());
         return TaskResponse.from(task);
     }
 
@@ -70,14 +70,14 @@ public class TaskService {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {
-            log.warn("Unauthorized task delete, taskId={}, username={}", id, task.getOwner().getUsername());
+            log.warn("Unauthorized task delete, taskId={}, userId={}", id, task.getOwner().getId());
             throw new ForbiddenException("Could not delete task: Access denied.");
         }
 
         task.softDelete();
         taskRepository.save(task);
 
-        log.info("Task soft deleted, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
+        log.info("Task soft deleted, taskId={}, ownerId={}", task.getId(), task.getOwner().getId());
     }
 
     @Transactional
@@ -85,7 +85,7 @@ public class TaskService {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {
-            log.warn("Unauthorized task update, taskId={}, username={}", task.getId(), authUtils.getCurrentUser().getUsername());
+            log.warn("Unauthorized task update, taskId={}, userId={}", task.getId(), authUtils.getCurrentUser().getId());
             throw new ForbiddenException("Could not update task: Access denied.");
         }
 
@@ -95,7 +95,7 @@ public class TaskService {
 
         taskRepository.save(task);
 
-        log.info("Task updated, taskId={}, owner={}, updatedAt={}", task.getId(), task.getOwner().getUsername(), task.getUpdatedAt());
+        log.info("Task updated, taskId={}, ownerId={}, updatedAt={}", task.getId(), task.getOwner().getId(), task.getUpdatedAt());
         return TaskResponse.from(task);
     }
 

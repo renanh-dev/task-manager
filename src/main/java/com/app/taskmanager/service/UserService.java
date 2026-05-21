@@ -24,7 +24,7 @@ public class UserService {
         user.softDelete();
 
         userRepository.save(user);
-        log.info("User soft deleted, username={}", user.getUsername());
+        log.info("User soft deleted, userId={}", user.getId());
     }
 
     public UserResponse getCurrentUser() {

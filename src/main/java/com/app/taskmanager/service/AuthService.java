@@ -72,7 +72,7 @@ public class AuthService {
 
         afterCommit(appMetrics::incrementRegistrations);
 
-        log.info("User registered: {}", user.getUsername());
+        log.info("User registered, userId={}", user.getId());
         return new AuthResponse(accessToken, refreshToken, user.getUsername(), user.getRole());
     }
 
@@ -81,19 +81,19 @@ public class AuthService {
 
         User user = userRepository.findByUsernameOrEmail(request.identifier(), request.identifier())
                 .orElseThrow(() -> {
-                    log.warn("Login failed, reason=user_not_found, identifier={}", request.identifier());
+                    log.warn("Login failed, reason=user_not_found");
                     return new InvalidCredentialsException("Invalid credentials.");
                 });
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            log.warn("Login failed, reason=invalid_password, identifier={}", request.identifier());
+            log.warn("Login failed, reason=invalid_password");
             throw new InvalidCredentialsException("Invalid credentials.");
         }
 
         String accessToken = jwtService.generateToken(user);
         String refreshToken = refreshTokenService.issue(user, Instant.now().plusMillis(absoluteExpiresAt));
 
-        log.info("User logged in, username={}", user.getUsername());
+        log.info("User logged in, userId={}", user.getId());
         return new AuthResponse(accessToken, refreshToken, user.getUsername(), user.getRole());
     }
 
@@ -103,7 +103,7 @@ public class AuthService {
         String newAccessToken = jwtService.generateToken(context.user());
         String newRefreshToken = refreshTokenService.issue(context.user(), context.absoluteExpiresAt());
 
-        log.info("Tokens rotated, username={}", context.user());
+        log.info("Tokens rotated, userId={}", context.user().getId());
 
         return new AuthResponse(newAccessToken, newRefreshToken, context.user().getUsername(), context.user().getRole());
     }
@@ -111,13 +111,13 @@ public class AuthService {
     @Transactional
     public void logout(RefreshTokenRequest request) {
         RefreshToken token = refreshTokenService.revoke(request.refreshToken());
-        log.info("User logged out, username={}, tokenId={}", token.getUser().getUsername(), token.getId());
+        log.info("User logged out, userId={}, tokenId={}", token.getUser().getId(), token.getId());
     }
 
     @Transactional
     public void logoutFromAllDevices() {
         User user = authUtils.getCurrentUser();
         refreshTokenService.revokeAllByActiveUser(user);
-        log.info("User logged out from all devices, username={}", user.getUsername());
+        log.info("User logged out from all devices, userId={}", user.getId());
     }
 }

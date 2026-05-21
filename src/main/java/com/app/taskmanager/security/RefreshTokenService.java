@@ -50,7 +50,7 @@ public class RefreshTokenService {
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid refresh token."));
 
         if (token.isRevoked()) {
-            log.warn("Refresh token reuse detected, username={}", token.getUser().getUsername());
+            log.warn("Refresh token reuse detected, userId={}", token.getUser().getId());
             refreshTokenRepository.revokeAllByActiveUser(token.getUser());
             throw new InvalidCredentialsException("Session invalidated due to token reuse. Please log in again.");
         }
