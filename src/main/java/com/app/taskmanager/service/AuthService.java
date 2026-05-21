@@ -105,8 +105,9 @@ public class AuthService {
         return new AuthResponse(newAccessToken, newRefreshToken, context.user().getUsername(), context.user().getRole());
     }
 
+    @Transactional
     public void logout(RefreshTokenRequest request) {
         RefreshToken token = refreshTokenService.revoke(request.refreshToken());
-        log.info("User logged out, username={}", token.getUser().getUsername());
+        log.info("User logged out, username={}, tokenId={}", token.getUser().getUsername(), token.getId());
     }
 }
