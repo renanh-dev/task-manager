@@ -1,6 +1,7 @@
 package com.app.taskmanager.controller;
 
 import com.app.taskmanager.dto.request.LoginRequest;
+import com.app.taskmanager.dto.request.RefreshTokenRequest;
 import com.app.taskmanager.dto.request.RegisterRequest;
 import com.app.taskmanager.dto.response.AuthResponse;
 import com.app.taskmanager.service.AuthService;
@@ -24,5 +25,16 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
+    }
+
+    @PostMapping("/refresh")
+    public AuthResponse refresh(@Valid @RequestBody RefreshTokenRequest request) {
+        return authService.refresh(request);
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@Valid @RequestBody RefreshTokenRequest request) {
+        authService.logout(request);
     }
 }

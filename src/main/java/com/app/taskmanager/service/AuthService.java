@@ -1,20 +1,26 @@
 package com.app.taskmanager.service;
 
+import com.app.taskmanager.dto.context.RefreshTokenContext;
 import com.app.taskmanager.dto.request.LoginRequest;
+import com.app.taskmanager.dto.request.RefreshTokenRequest;
 import com.app.taskmanager.dto.request.RegisterRequest;
 import com.app.taskmanager.dto.response.AuthResponse;
+import com.app.taskmanager.entity.RefreshToken;
 import com.app.taskmanager.entity.User;
 import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
-import com.app.taskmanager.security.JwtProcessing;
 import com.app.taskmanager.security.JwtService;
+import com.app.taskmanager.security.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
 
 import static com.app.taskmanager.util.TransactionUtils.afterCommit;
 
@@ -29,8 +35,12 @@ public class AuthService {
 
     private final AppMetrics appMetrics;
 
-    private final JwtProcessing jwtProcessing;
     private final JwtService jwtService;
+
+    private final RefreshTokenService refreshTokenService;
+
+    @Value("${refresh.absolute.expiry}")
+    private Long absoluteExpiresAt;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -54,13 +64,13 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String token = jwtProcessing.generateToken(user);
         String accessToken = jwtService.generateToken(user);
+        String refreshToken = refreshTokenService.issue(user, Instant.now().plusMillis(absoluteExpiresAt));
 
         afterCommit(appMetrics::incrementRegistrations);
 
         log.info("User registered: {}", user.getUsername());
-        return new AuthResponse(token, user.getUsername(), user.getRole());
+        return new AuthResponse(accessToken, refreshToken, user.getUsername(), user.getRole());
     }
 
     @Transactional
@@ -77,10 +87,25 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid credentials.");
         }
 
-        String token = jwtProcessing.generateToken(user);
         String accessToken = jwtService.generateToken(user);
+        String refreshToken = refreshTokenService.issue(user, Instant.now().plusMillis(absoluteExpiresAt));
 
         log.info("User logged in, username={}", user.getUsername());
-        return new AuthResponse(token, user.getUsername(), user.getRole());
+        return new AuthResponse(accessToken, refreshToken, user.getUsername(), user.getRole());
+    }
+
+    public AuthResponse refresh(RefreshTokenRequest request) {
+        RefreshTokenContext context = refreshTokenService.validateAndRevoke(request.refreshToken());
+        String newAccessToken = jwtService.generateToken(context.user());
+        String newRefreshToken = refreshTokenService.issue(context.user(), context.absoluteExpiresAt());
+
+        log.info("Tokens rotated, username={}", context.user());
+
+        return new AuthResponse(newAccessToken, newRefreshToken, context.user().getUsername(), context.user().getRole());
+    }
+
+    public void logout(RefreshTokenRequest request) {
+        RefreshToken token = refreshTokenService.revoke(request.refreshToken());
+        log.info("User logged out, username={}", token.getUser().getUsername());
     }
 }
