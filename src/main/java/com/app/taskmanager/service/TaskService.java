@@ -77,7 +77,7 @@ public class TaskService {
         task.softDelete();
         taskRepository.save(task);
 
-        log.info("Task deleted, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
+        log.info("Task soft deleted, taskId={}, owner={}", task.getId(), task.getOwner().getUsername());
     }
 
     @Transactional
