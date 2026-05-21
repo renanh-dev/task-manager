@@ -1,5 +1,6 @@
 package com.app.taskmanager.ratelimit;
 
+import com.app.taskmanager.entity.User;
 import com.app.taskmanager.exception.RateLimitException;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
@@ -30,11 +31,14 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         Bucket bucket;
 
         if (path.equals("/api/auth/refresh")) {
-            bucket = rateLimiterService.resolveBucket(ip + ":refresh", 3, Duration.ofMinutes(15));
+            bucket = rateLimiterService.resolveBucket("refresh:" + ip, 3, Duration.ofMinutes(15));
         } else if (isAuthenticated()) {
-            bucket = rateLimiterService.resolveBucket(ip + ":api", 100, Duration.ofMinutes(1));
+            var principal = (User) SecurityContextHolder.getContext()
+                    .getAuthentication()
+                    .getPrincipal();
+            bucket = rateLimiterService.resolveBucket("user:" + principal.getId(), 30, Duration.ofMinutes(1));
         } else {
-            bucket = rateLimiterService.resolveBucket(ip, 10, Duration.ofMinutes(1));
+            bucket = rateLimiterService.resolveBucket("unauthenticated:" + ip, 10, Duration.ofMinutes(1));
         }
 
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
