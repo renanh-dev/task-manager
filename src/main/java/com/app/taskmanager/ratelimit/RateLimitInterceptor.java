@@ -25,10 +25,13 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                              Object handler) {
 
         String ip = resolveClientIp(request);
+        String path = request.getRequestURI();
 
         Bucket bucket;
 
-        if (isAuthenticated()) {
+        if (path.equals("/api/auth/refresh")) {
+            bucket = rateLimiterService.resolveBucket(ip + ":refresh", 3, Duration.ofMinutes(15));
+        } else if (isAuthenticated()) {
             bucket = rateLimiterService.resolveBucket(ip + ":api", 100, Duration.ofMinutes(1));
         } else {
             bucket = rateLimiterService.resolveBucket(ip, 10, Duration.ofMinutes(1));
