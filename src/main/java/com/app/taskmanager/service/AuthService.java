@@ -11,6 +11,7 @@ import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
+import com.app.taskmanager.security.AuthUtils;
 import com.app.taskmanager.security.JwtService;
 import com.app.taskmanager.security.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,8 @@ public class AuthService {
     private final JwtService jwtService;
 
     private final RefreshTokenService refreshTokenService;
+
+    private final AuthUtils authUtils;
 
     @Value("${refresh.absolute.expiry}")
     private Long absoluteExpiresAt;
@@ -109,5 +112,12 @@ public class AuthService {
     public void logout(RefreshTokenRequest request) {
         RefreshToken token = refreshTokenService.revoke(request.refreshToken());
         log.info("User logged out, username={}, tokenId={}", token.getUser().getUsername(), token.getId());
+    }
+
+    @Transactional
+    public void logoutFromAllDevices() {
+        User user = authUtils.getCurrentUser();
+        refreshTokenService.revokeAllByActiveUser(user);
+        log.info("User logged out from all devices, username={}", user.getUsername());
     }
 }

@@ -37,4 +37,10 @@ public class AuthController {
     public void logout(@Valid @RequestBody RefreshTokenRequest request) {
         authService.logout(request);
     }
+
+    @DeleteMapping("/logout/all")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logoutAllDevices() {
+        authService.logoutFromAllDevices();
+    }
 }

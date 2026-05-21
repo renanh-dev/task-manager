@@ -74,6 +74,11 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(token);
     }
 
+    @Transactional
+    public void revokeAllByActiveUser(User user) {
+        refreshTokenRepository.revokeAllByActiveUser(user);
+    }
+
     // - private -
 
     private String hash(String raw) {
