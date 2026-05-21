@@ -9,6 +9,7 @@ import com.app.taskmanager.exception.InvalidCredentialsException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.JwtProcessing;
+import com.app.taskmanager.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ public class AuthService {
     private final AppMetrics appMetrics;
 
     private final JwtProcessing jwtProcessing;
+    private final JwtService jwtService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -53,6 +55,7 @@ public class AuthService {
         userRepository.save(user);
 
         String token = jwtProcessing.generateToken(user);
+        String accessToken = jwtService.generateToken(user);
 
         afterCommit(appMetrics::incrementRegistrations);
 
@@ -62,6 +65,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
+
         User user = userRepository.findByUsernameOrEmail(request.identifier(), request.identifier())
                 .orElseThrow(() -> {
                     log.warn("Login failed, reason=user_not_found, identifier={}", request.identifier());
@@ -74,6 +78,7 @@ public class AuthService {
         }
 
         String token = jwtProcessing.generateToken(user);
+        String accessToken = jwtService.generateToken(user);
 
         log.info("User logged in, username={}", user.getUsername());
         return new AuthResponse(token, user.getUsername(), user.getRole());

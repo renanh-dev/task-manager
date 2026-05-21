@@ -20,7 +20,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-    private final JwtProcessing jwtProcessing;
+    private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Override
@@ -40,7 +40,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String username;
 
         try {
-            username = jwtProcessing.extractUsername(token);
+            username = jwtService.extractUsername(token);
         } catch (JwtException ex) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
@@ -57,7 +57,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 return;
             }
 
-            if (jwtProcessing.isTokenValid(token, userDetails)) {
+            if (jwtService.isTokenValid(token, userDetails)) {
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,

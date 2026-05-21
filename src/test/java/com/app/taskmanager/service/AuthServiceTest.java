@@ -8,7 +8,7 @@ import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
-import com.app.taskmanager.security.JwtProcessing;
+import com.app.taskmanager.security.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ public class AuthServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private JwtProcessing jwtProcessing;
+    private JwtService jwtService;
 
     @Mock
     private AppMetrics appMetrics;
@@ -69,13 +69,13 @@ public class AuthServiceTest {
     void register_UserIsCreatedAndSaved() {
         when(userRepository.existsByUsername(username)).thenReturn(false);
         when(userRepository.existsByEmail(email)).thenReturn(false);
-        when(jwtProcessing.generateToken(any(User.class))).thenReturn("token");
+        when(jwtService.generateToken(any(User.class))).thenReturn("token");
 
         AuthResponse response = authService.register(regRequest);
 
         verify(userRepository).save(any(User.class));
-        verify(jwtProcessing).generateToken(any(User.class));
-        assertThat(response.token()).isEqualTo("token");
+        verify(jwtService).generateToken(any(User.class));
+        assertThat(response.accessToken()).isEqualTo("token");
     }
 
     @Test
@@ -103,11 +103,11 @@ public class AuthServiceTest {
     void login_UserAuthenticated() {
         when(userRepository.findByUsernameOrEmail(username, username)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(logRequest.password(), user.getPassword())).thenReturn(true);
-        when(jwtProcessing.generateToken(any(User.class))).thenReturn("token");
+        when(jwtService.generateToken(any(User.class))).thenReturn("token");
 
         authService.login(logRequest);
 
-        verify(jwtProcessing).generateToken(any(User.class));
+        verify(jwtService).generateToken(any(User.class));
     }
 
     @Test
