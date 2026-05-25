@@ -66,4 +66,16 @@ public class User implements UserDetails {
     public void softDelete() {
         this.deletedAt = Instant.now();
     }
+
+    public void changeUsername(String username) {
+        this.username = username;
+    }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeEmail(String email) {
+        this.email = email;
+    }
 }
