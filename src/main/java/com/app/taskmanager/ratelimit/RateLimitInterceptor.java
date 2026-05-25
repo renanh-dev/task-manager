@@ -53,7 +53,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         throw new RateLimitException(retryAfterSeconds);
     }
 
-    private String resolveClientIp(HttpServletRequest request) {
+    private String resolveClientIp(HttpServletRequest request) { // implementation designed for requests arriving from a trusted proxy
         String xff = request.getHeader("X-Forwarded-For");
         if (xff != null && !xff.isBlank()) {
             return xff.split(",")[0].trim();
