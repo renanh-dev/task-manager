@@ -21,13 +21,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
-        log.warn("Resource not found: {}", ex.getMessage());
         return build(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex) {
-        log.warn("Invalid credentials: {}", ex.getMessage());
         return build(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
@@ -47,7 +45,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex) {
-        log.warn("Forbidden access: {}", ex.getMessage());
         return build(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
