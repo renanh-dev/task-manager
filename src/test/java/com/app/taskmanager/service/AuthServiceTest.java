@@ -1,6 +1,8 @@
 package com.app.taskmanager.service;
 
+import com.app.taskmanager.dto.context.RefreshTokenContext;
 import com.app.taskmanager.dto.request.LoginRequest;
+import com.app.taskmanager.dto.request.RefreshTokenRequest;
 import com.app.taskmanager.dto.request.RegisterRequest;
 import com.app.taskmanager.dto.response.AuthResponse;
 import com.app.taskmanager.entity.User;
@@ -9,7 +11,7 @@ import com.app.taskmanager.exception.InvalidCredentialsException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.JwtService;
-import lombok.extern.slf4j.Slf4j;
+import com.app.taskmanager.security.RefreshTokenService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -28,8 +31,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @ExtendWith(MockitoExtension.class)
-@Slf4j
 public class AuthServiceTest {
+
+    @InjectMocks
+    private AuthService authService;
 
     @Mock
     private UserRepository userRepository;
@@ -41,26 +46,35 @@ public class AuthServiceTest {
     private JwtService jwtService;
 
     @Mock
-    private AppMetrics appMetrics;
+    private RefreshTokenService refreshTokenService;
 
-    @InjectMocks
-    private AuthService authService;
+    @Mock
+    private AppMetrics appMetrics;
 
     private RegisterRequest regRequest;
     private LoginRequest logRequest;
+    private RefreshTokenRequest refreshRequest;
+    private RefreshTokenContext refreshContext;
 
-    private String username = "John";
-    private String password = "JohnPass";
-    private String email = "John@johnmail.com";
+    private final String username = "John";
+    private final String password = "JohnPass";
+    private final String email = "John@johnmail.com";
+    private final String oldRefreshToken = "oldRefreshToken";
 
     private User user;
 
+    private static final Long refreshAbsoluteExpiry = 2592000000L;
+
     @BeforeEach
     void setUp() {
-        regRequest = new RegisterRequest(username, password, email);
-        logRequest = new LoginRequest(username, password);
+        setField(authService, "refreshAbsoluteExpiry", refreshAbsoluteExpiry);
 
         user = buildUser(1L, email, username, password);
+
+        regRequest = new RegisterRequest(username, password, email);
+        logRequest = new LoginRequest(username, password);
+        refreshRequest = new RefreshTokenRequest(oldRefreshToken);
+        refreshContext = new RefreshTokenContext(user, Instant.now().plusMillis(refreshAbsoluteExpiry));
     }
 
     // - Register -
@@ -70,12 +84,15 @@ public class AuthServiceTest {
         when(userRepository.existsByUsername(username)).thenReturn(false);
         when(userRepository.existsByEmail(email)).thenReturn(false);
         when(jwtService.generateToken(any(User.class))).thenReturn("token");
+        when(refreshTokenService.issue(any(User.class), any(Instant.class))).thenReturn("refreshToken");
 
         AuthResponse response = authService.register(regRequest);
 
         verify(userRepository).save(any(User.class));
         verify(jwtService).generateToken(any(User.class));
+        verify(refreshTokenService).issue(any(User.class),any(Instant.class));
         assertThat(response.accessToken()).isEqualTo("token");
+        assertThat(response.refreshToken()).isEqualTo("refreshToken");
     }
 
     @Test
@@ -104,10 +121,14 @@ public class AuthServiceTest {
         when(userRepository.findByUsernameOrEmail(username, username)).thenReturn(Optional.of(user));
         when(passwordEncoder.matches(logRequest.password(), user.getPassword())).thenReturn(true);
         when(jwtService.generateToken(any(User.class))).thenReturn("token");
+        when(refreshTokenService.issue(any(User.class), any(Instant.class))).thenReturn("refreshToken");
 
-        authService.login(logRequest);
+        AuthResponse response = authService.login(logRequest);
 
         verify(jwtService).generateToken(any(User.class));
+        verify(refreshTokenService).issue(any(User.class), any(Instant.class));
+        assertThat(response.accessToken()).isEqualTo("token");
+        assertThat(response.refreshToken()).isEqualTo("refreshToken");
     }
 
     @Test
@@ -129,6 +150,24 @@ public class AuthServiceTest {
                 .hasMessage("Invalid credentials.");
     }
 
+    // - Refresh -
+
+    @Test
+    void refresh_TokensRotateSuccessfully() {
+        when(refreshTokenService.validateAndRevoke(oldRefreshToken)).thenReturn(refreshContext);
+        when(jwtService.generateToken(refreshContext.user())).thenReturn("token");
+        when(refreshTokenService.issue(refreshContext.user(), refreshContext.absoluteExpiresAt())).thenReturn("refreshToken");
+
+        AuthResponse response = authService.refresh(refreshRequest);
+
+        verify(refreshTokenService).validateAndRevoke(oldRefreshToken);
+        verify(jwtService).generateToken(refreshContext.user());
+        verify(refreshTokenService).issue(refreshContext.user(), refreshContext.absoluteExpiresAt());
+        assertThat(response.refreshToken()).isEqualTo("refreshToken");
+        assertThat(response.accessToken()).isEqualTo("token");
+        assertThat(response.username()).isEqualTo(user.getUsername());
+        assertThat(response.role()).isEqualTo(user.getRole());
+    }
 
     // - Helper -
 
