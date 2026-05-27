@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 public class UserController {
 
     private final UserService userService;
@@ -25,7 +25,7 @@ public class UserController {
         return userService.changeCredentials(request);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/me")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOwnUser() {
         userService.deleteOwnUser();
