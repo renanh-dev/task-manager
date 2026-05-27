@@ -33,7 +33,7 @@
                 <includeMdcKeyName>requestId</includeMdcKeyName>
                 <includeMdcKeyName>method</includeMdcKeyName>
                 <includeMdcKeyName>path</includeMdcKeyName>
-                <includeMdcKeyName>username</includeMdcKeyName>
+                <includeMdcKeyName>userId</includeMdcKeyName>
             </encoder>
         </appender>
 
