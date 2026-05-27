@@ -43,7 +43,7 @@ public class AuthService {
     private final AuthUtils authUtils;
 
     @Value("${refresh.absolute.expiry}")
-    private Long absoluteExpiresAt;
+    private Long refreshAbsoluteExpiry;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -68,7 +68,7 @@ public class AuthService {
         userRepository.save(user);
 
         String accessToken = jwtService.generateToken(user);
-        String refreshToken = refreshTokenService.issue(user, Instant.now().plusMillis(absoluteExpiresAt));
+        String refreshToken = refreshTokenService.issue(user, Instant.now().plusMillis(refreshAbsoluteExpiry));
 
         afterCommit(appMetrics::incrementRegistrations);
 
@@ -91,7 +91,7 @@ public class AuthService {
         }
 
         String accessToken = jwtService.generateToken(user);
-        String refreshToken = refreshTokenService.issue(user, Instant.now().plusMillis(absoluteExpiresAt));
+        String refreshToken = refreshTokenService.issue(user, Instant.now().plusMillis(refreshAbsoluteExpiry));
 
         log.info("User logged in, userId={}", user.getId());
         return new AuthResponse(accessToken, refreshToken, user.getUsername(), user.getRole());

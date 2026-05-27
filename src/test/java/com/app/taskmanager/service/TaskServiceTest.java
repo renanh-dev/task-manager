@@ -115,7 +115,6 @@ public class TaskServiceTest {
         assertThat(response.status()).isEqualTo(TaskStatus.TODO);
 
         verify(taskRepository, times(1)).save(any(Task.class));
-        // verifies save() was called exactly once.
     }
 
     // - deleteTask -
