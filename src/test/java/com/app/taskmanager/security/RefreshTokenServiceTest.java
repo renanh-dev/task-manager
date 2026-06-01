@@ -123,6 +123,7 @@ public class RefreshTokenServiceTest {
 
         refreshTokenService.revoke("raw");
 
+        assertThat(refreshToken.isRevoked()).isTrue();
         verify(refreshTokenRepository).save(any(RefreshToken.class));
     }
 
