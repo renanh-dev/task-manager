@@ -22,11 +22,18 @@ public class MdcFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
+            String xff = request.getHeader("X-Forwarded-For");
+
             String requestId = UUID.randomUUID().toString().substring(0, 8);
             MDC.put("requestId", requestId);
             MDC.put("method", request.getMethod());
             MDC.put("path", request.getRequestURI());
-            MDC.put("ip", request.getRemoteAddr());
+
+            if (xff != null && !xff.isBlank()) {
+                MDC.put("ip", xff.split(",")[0].trim());
+            } else {
+                MDC.put("ip", request.getRemoteAddr());
+            }
 
             response.setHeader("X-Request-ID", requestId);
             filterChain.doFilter(request, response);
