@@ -8,6 +8,7 @@ import com.app.taskmanager.dto.response.AuthResponse;
 import com.app.taskmanager.entity.User;
 import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
+import com.app.taskmanager.exception.ResourceConflictException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.JwtService;
@@ -100,7 +101,7 @@ public class AuthServiceTest {
         when(userRepository.existsByUsername(username)).thenReturn(true);
 
         assertThatThrownBy(() -> authService.register(regRequest))
-                .isInstanceOf(InvalidCredentialsException.class)
+                .isInstanceOf(ResourceConflictException.class)
                 .hasMessage("Username is already taken.");
     }
 
@@ -110,7 +111,7 @@ public class AuthServiceTest {
         when(userRepository.existsByEmail(email)).thenReturn(true);
 
         assertThatThrownBy(() -> authService.register(regRequest))
-                .isInstanceOf(InvalidCredentialsException.class)
+                .isInstanceOf(ResourceConflictException.class)
                 .hasMessage("Email is already taken.");
     }
 
