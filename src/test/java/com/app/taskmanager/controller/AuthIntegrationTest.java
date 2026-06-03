@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -192,5 +193,47 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
 
     // - Logout -
 
+    @Test
+    void logout_invalidatesRefreshToken() throws Exception {
+        AuthResponse original = auth.register("logoutuser");
+        RefreshTokenRequest request = new RefreshTokenRequest(original.refreshToken());
 
+        mockMvc.perform(post("/api/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void logoutAllDevices_requiresAuthentication() throws Exception {
+        mockMvc.perform(post("/api/auth/logout/all"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void logoutAllDevices_revokesAllRefreshTokens() throws Exception {
+        AuthResponse original = auth.register("logoutuser");
+
+        String rotatedBody = mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new RefreshTokenRequest(original.refreshToken()))))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        AuthResponse rotated = objectMapper.readValue(rotatedBody, AuthResponse.class);
+
+        mockMvc.perform(delete("/api/auth/logout/all")
+                        .header("Authorization", auth.bearer(rotated.accessToken())))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new RefreshTokenRequest(rotated.refreshToken()))))
+                .andExpect(status().isUnauthorized());
+    }
 }
