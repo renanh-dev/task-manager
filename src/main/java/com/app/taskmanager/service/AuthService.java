@@ -9,6 +9,7 @@ import com.app.taskmanager.entity.RefreshToken;
 import com.app.taskmanager.entity.User;
 import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
+import com.app.taskmanager.exception.ResourceConflictException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.AuthUtils;
@@ -50,12 +51,12 @@ public class AuthService {
 
         if (userRepository.existsByUsername(request.username())) {
             log.warn("Registration failed, reason=username_taken, username={}", request.username());
-            throw new InvalidCredentialsException("Username is already taken.");
+            throw new ResourceConflictException("Username is already taken.");
         }
 
         if (userRepository.existsByEmail(request.email())) {
             log.warn("Registration failed, reason=email_taken, email={}", request.email());
-            throw new InvalidCredentialsException("Email is already taken.");
+            throw new ResourceConflictException("Email is already taken.");
         }
 
         User user = User.builder()
