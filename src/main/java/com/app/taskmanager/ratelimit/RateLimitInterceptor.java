@@ -36,9 +36,9 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             var principal = (User) SecurityContextHolder.getContext()
                     .getAuthentication()
                     .getPrincipal();
-            bucket = rateLimiterService.resolveBucket("user:" + principal.getId(), 30, Duration.ofMinutes(1));
+            bucket = rateLimiterService.resolveBucket("user:" + principal.getId(), 20, Duration.ofMinutes(1));
         } else {
-            bucket = rateLimiterService.resolveBucket("unauthenticated:" + ip, 10, Duration.ofMinutes(1));
+            bucket = rateLimiterService.resolveBucket("unauthenticated:" + ip, 5, Duration.ofMinutes(1));
         }
 
         ConsumptionProbe probe = bucket.tryConsumeAndReturnRemaining(1);
