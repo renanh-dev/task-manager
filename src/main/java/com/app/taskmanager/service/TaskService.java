@@ -37,6 +37,14 @@ public class TaskService {
     }
 
     @Transactional(readOnly = true)
+    public Page<TaskResponse> getTasksFiltered(String title, TaskStatus status, Pageable pageable) {
+        if (title != null && title.isBlank()) title = null;
+
+        return taskRepository.findByFilters(title, status, pageable)
+                .map(TaskResponse::from);
+    }
+
+    @Transactional(readOnly = true)
     public TaskResponse getTask(Long id) {
         Task task = findTaskById(id);
 

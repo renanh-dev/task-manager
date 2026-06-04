@@ -3,6 +3,7 @@ package com.app.taskmanager.controller;
 import com.app.taskmanager.dto.request.TaskRequest;
 import com.app.taskmanager.dto.request.TaskUpdateRequest;
 import com.app.taskmanager.dto.response.TaskResponse;
+import com.app.taskmanager.enums.TaskStatus;
 import com.app.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,15 @@ public class TaskController {
     }
 
     @GetMapping
-    public Page<TaskResponse> getTasks(Pageable pageable) { // Page for returning, Pageable for requesting.
+    public Page<TaskResponse> getTasks(Pageable pageable) {
         return taskService.getTasks(pageable);
+    }
+
+    @GetMapping("/filter")
+    public Page<TaskResponse> getTasksFiltered(@RequestParam(required = false) String title,
+                                               @RequestParam(required = false) TaskStatus status,
+                                               Pageable pageable) {
+        return taskService.getTasksFiltered(title, status, pageable);
     }
 
     @GetMapping("/{id}")
