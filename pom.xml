@@ -19,6 +19,11 @@
     </properties>
 
     <dependencies>
+        <!-- Cache -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
         <!-- Rate limit -->
         <dependency>
             <groupId>com.bucket4j</groupId>
