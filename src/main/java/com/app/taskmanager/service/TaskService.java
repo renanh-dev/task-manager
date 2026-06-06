@@ -40,7 +40,8 @@ public class TaskService {
     public Page<TaskResponse> getTasksFiltered(String title, TaskStatus status, Pageable pageable) {
         if (title != null && title.isBlank()) title = null;
 
-        return taskRepository.findByFilters(title, status, pageable)
+        Long ownerId = authUtils.getCurrentUser().getId();
+        return taskRepository.findByFilters(ownerId, title, status, pageable)
                 .map(TaskResponse::from);
     }
 

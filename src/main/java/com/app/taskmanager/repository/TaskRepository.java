@@ -15,9 +15,11 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     Page<Task> findTasksByOwnerId(Long ownerId, Pageable pageable);
 
     @Query("SELECT t FROM Task t WHERE " +
+            "t.owner.id = :ownerId AND " +
             "(:title IS NULL OR LOWER(t.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
             "(:status IS NULL OR t.taskStatus = :status)")
-    Page<Task> findByFilters(@Param("title") String title,
-                             @Param("status") TaskStatus status,  // enum here
+    Page<Task> findByFilters(@Param("ownerId") Long ownerId,
+                             @Param("title") String title,
+                             @Param("status") TaskStatus status,
                              Pageable pageable);
 }
