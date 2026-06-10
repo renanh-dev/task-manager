@@ -57,7 +57,7 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request2)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isConflict());
     }
 
     @Test
@@ -73,7 +73,7 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request2)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isConflict());
     }
 
     @Test
