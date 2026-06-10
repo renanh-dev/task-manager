@@ -77,23 +77,23 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void register_withInvalidPassword_returns401() throws Exception {
+    void register_withInvalidPassword_returns400() throws Exception {
         RegisterRequest req = new RegisterRequest("validuser1", "password1", "valid1@example.com");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void register_withInvalidUsername_returns401() throws Exception {
+    void register_withInvalidUsername_returns400() throws Exception {
         RegisterRequest req = new RegisterRequest("bad user!", "Password1", "valid2@example.com");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isBadRequest());
     }
 
     // - Login -
@@ -198,10 +198,10 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
         AuthResponse original = auth.register("logoutuser");
         RefreshTokenRequest request = new RefreshTokenRequest(original.refreshToken());
 
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(delete("/api/auth/logout")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isNoContent());
 
         mockMvc.perform(post("/api/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -211,7 +211,7 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void logoutAllDevices_requiresAuthentication() throws Exception {
-        mockMvc.perform(post("/api/auth/logout/all"))
+        mockMvc.perform(delete("/api/auth/logout/all"))
                 .andExpect(status().isUnauthorized());
     }
 
