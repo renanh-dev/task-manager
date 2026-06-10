@@ -74,7 +74,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new LoginRequest(currentUser.username(), "Password1"))))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnauthorized());
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

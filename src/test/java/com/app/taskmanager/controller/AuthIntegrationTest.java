@@ -62,8 +62,8 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void register_withDuplicateEmail_returns401() throws Exception {
-        RegisterRequest request1 = new RegisterRequest("fixedUser1", "Password1", "fixedUser1@example.com");
-        RegisterRequest request2 = new RegisterRequest("fixedUser2", "Password1", "fixedUser1@example.com");
+        RegisterRequest request1 = new RegisterRequest("fixedUser165", "Password1", "fixedUser165@example.com");
+        RegisterRequest request2 = new RegisterRequest("fixedUser235", "Password1", "fixedUser165@example.com");
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
