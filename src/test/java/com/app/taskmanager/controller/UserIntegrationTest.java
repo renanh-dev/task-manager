@@ -110,7 +110,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
         mockMvc.perform(get("/api/user/me")
                         .header("Authorization", auth.bearer(currentUser.accessToken())))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isNotFound());
     }
 
     @Test

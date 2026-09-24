@@ -63,10 +63,6 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public void softDelete() {
-        this.deletedAt = Instant.now();
-    }
-
     public void changeUsername(String username) {
         this.username = username;
     }

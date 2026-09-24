@@ -24,7 +24,7 @@ public class Task {
     @Column(nullable = false, unique = true)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Avoid EAGER loading, causes N+1 query issue.
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
 

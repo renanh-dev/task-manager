@@ -117,8 +117,7 @@ public class AuthService {
 
     @Transactional
     public void logoutFromAllDevices() {
-        User user = authUtils.getCurrentUser();
-        refreshTokenService.revokeAllByActiveUser(user);
-        log.info("User logged out from all devices, userId={}", user.getId());
+        refreshTokenService.revokeAllByActiveUser(authUtils.getCurrentUserId());
+        log.info("User logged out from all devices, userId={}", authUtils.getCurrentUserId());
     }
 }

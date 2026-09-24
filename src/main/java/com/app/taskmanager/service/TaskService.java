@@ -30,9 +30,11 @@ public class TaskService {
 
     private final AppMetrics appMetrics;
 
+    private final UserService userService;
+
     @Transactional(readOnly = true)
     public Page<TaskResponse> getTasks(Pageable pageable) {
-        return taskRepository.findTasksByOwnerId(authUtils.getCurrentUser().getId(), pageable)
+        return taskRepository.findTasksByOwnerId(authUtils.getCurrentUserId(), pageable)
                 .map(TaskResponse::from);
     }
 
@@ -40,7 +42,7 @@ public class TaskService {
     public Page<TaskResponse> getTasksFiltered(String title, TaskStatus status, Pageable pageable) {
         if (title != null && title.isBlank()) title = null;
 
-        Long ownerId = authUtils.getCurrentUser().getId();
+        Long ownerId = authUtils.getCurrentUserId();
         return taskRepository.findByFilters(ownerId, title, status, pageable)
                 .map(TaskResponse::from);
     }
@@ -50,7 +52,7 @@ public class TaskService {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {
-            log.warn("Unauthorized task access, taskId={}, userId={}", id, authUtils.getCurrentUser().getId());
+            log.warn("Unauthorized task access, taskId={}, userId={}", id, authUtils.getCurrentUserId());
             throw new ForbiddenException("Could not get task: Access denied.");
         }
 
@@ -59,10 +61,12 @@ public class TaskService {
 
     @Transactional
     public TaskResponse createTask(TaskRequest taskRequest) {
+        Long ownerId = authUtils.getCurrentUserId();
+
         Task task = Task.builder()
                 .title(taskRequest.title())
                 .description(taskRequest.description())
-                .owner(authUtils.getCurrentUser())
+                .owner(userService.getReferenceById(ownerId))
                 .status(TaskStatus.TODO)
                 .build();
 
@@ -70,7 +74,7 @@ public class TaskService {
 
         afterCommit(appMetrics::recordTaskCreation);
 
-        log.info("Task created, taskId={}, ownerId={}, createdAt={}", task.getId(), task.getOwner().getId(), task.getCreatedAt());
+        log.info("Task created, taskId={}, ownerId={}, createdAt={}", task.getId(), ownerId, task.getCreatedAt());
         return TaskResponse.from(task);
     }
 
@@ -79,14 +83,14 @@ public class TaskService {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {
-            log.warn("Unauthorized task delete, taskId={}, userId={}", id, task.getOwner().getId());
+            log.warn("Unauthorized task delete, taskId={}, userId={}", id, authUtils.getCurrentUserId());
             throw new ForbiddenException("Could not delete task: Access denied.");
         }
 
         task.softDelete();
         taskRepository.save(task);
 
-        log.info("Task soft deleted, taskId={}, ownerId={}", task.getId(), task.getOwner().getId());
+        log.info("Task soft deleted, taskId={}, ownerId={}", task.getId(), authUtils.getCurrentUserId());
     }
 
     @Transactional
@@ -94,7 +98,7 @@ public class TaskService {
         Task task = findTaskById(id);
 
         if (isNotOwner(task)) {
-            log.warn("Unauthorized task update, taskId={}, userId={}", task.getId(), authUtils.getCurrentUser().getId());
+            log.warn("Unauthorized task update, taskId={}, userId={}", task.getId(), authUtils.getCurrentUserId());
             throw new ForbiddenException("Could not update task: Access denied.");
         }
 
@@ -104,12 +108,12 @@ public class TaskService {
 
         taskRepository.save(task);
 
-        log.info("Task updated, taskId={}, ownerId={}, updatedAt={}", task.getId(), task.getOwner().getId(), task.getUpdatedAt());
+        log.info("Task updated, taskId={}, ownerId={}, updatedAt={}", task.getId(), authUtils.getCurrentUserId(), task.getUpdatedAt());
         return TaskResponse.from(task);
     }
 
     private boolean isNotOwner(Task task) {
-        return !task.getOwner().getId().equals(authUtils.getCurrentUser().getId());
+        return !task.getOwner().getId().equals(authUtils.getCurrentUserId());
     }
 
     private Task findTaskById(Long id) {

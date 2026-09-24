@@ -1,23 +1,22 @@
 <configuration>
 
-    <springProfile name="dev">
-        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder>
-                <pattern>
-                    %d{HH:mm:ss}
-                    [%thread]
-                    %-5level
-                    %logger{36}
-                    [username:%X{username}]
-                    [req:%X{requestId:-}]
-                    [trace:%X{traceId:-}]
-                    [span:%X{spanId:-}]
-                    [%X{method} %X{path}]
-                    - %msg%n
-                </pattern>
-            </encoder>
-        </appender>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %d{HH:mm:ss}
+                %-5level
+                %logger{36}
+                [userId:%X{userId}]
+                [req:%X{requestId:-}]
+                [trace:%X{traceId:-}]
+                [span:%X{spanId:-}]
+                [%X{method} %X{path}]
+                - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
 
+    <springProfile name="dev">
         <logger name="com.app.taskmanager" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
@@ -28,21 +27,12 @@
     </springProfile>
 
     <springProfile name="prod">
-        <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-                <includeMdcKeyName>requestId</includeMdcKeyName>
-                <includeMdcKeyName>method</includeMdcKeyName>
-                <includeMdcKeyName>path</includeMdcKeyName>
-                <includeMdcKeyName>userId</includeMdcKeyName>
-            </encoder>
-        </appender>
-
         <logger name="com.app.taskmanager" level="INFO" additivity="false">
-            <appender-ref ref="JSON_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
         </logger>
 
         <root level="WARN">
-            <appender-ref ref="JSON_CONSOLE"/>
+            <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
 

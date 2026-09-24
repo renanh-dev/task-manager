@@ -51,7 +51,7 @@ public class RefreshTokenService {
 
         if (token.isRevoked()) {
             log.warn("Refresh token reuse detected, userId={}", token.getUser().getId());
-            refreshTokenRepository.revokeAllByActiveUser(token.getUser());
+            refreshTokenRepository.revokeAllByUserId(token.getUser().getId());
             throw new InvalidCredentialsException("Session invalidated due to token reuse. Please log in again.");
         }
 
@@ -75,8 +75,8 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public void revokeAllByActiveUser(User user) {
-        refreshTokenRepository.revokeAllByActiveUser(user);
+    public void revokeAllByActiveUser(Long userId) {
+        refreshTokenRepository.revokeAllByUserId(userId);
     }
 
     // - private -

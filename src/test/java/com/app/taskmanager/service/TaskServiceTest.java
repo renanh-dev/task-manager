@@ -39,6 +39,9 @@ public class TaskServiceTest {
     @Mock
     private AppMetrics appMetrics;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private TaskService taskService;
 
@@ -64,14 +67,11 @@ public class TaskServiceTest {
 
     @Test
     void getTask_returnsTask_whenOwnerMatches() {
-        // arrange - what the mock returns when each method is called
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
-        when(authUtils.getCurrentUser()).thenReturn(owner);
+        when(authUtils.getCurrentUserId()).thenReturn(owner.getId());
 
-        // act - call the real method
         TaskResponse response = taskService.getTask(10L);
 
-        // assert - verify result
         assertThat(response.id()).isEqualTo(10L);
         assertThat(response.title()).isEqualTo("Write tests");
         assertThat(response.status()).isEqualTo(TaskStatus.TODO);
@@ -82,14 +82,14 @@ public class TaskServiceTest {
         when(taskRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> taskService.getTask(99L))
-                .isInstanceOf(ResourceNotFoundException.class) // correct way of asserting exceptions happen
+                .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Task not found.");
     }
 
     @Test
     void getTask_throwsUnauthorized_whenDifferentUserOwnsTask() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task)); // task is owned by john
-        when(authUtils.getCurrentUser()).thenReturn(otherUser);           // current user logged in is audrey
+        when(authUtils.getCurrentUserId()).thenReturn(otherUser.getId()); // current user logged in is audrey
 
         assertThatThrownBy(() -> taskService.getTask(10L))
                 .isInstanceOf(ForbiddenException.class);
@@ -100,7 +100,8 @@ public class TaskServiceTest {
     @Test
     void createTask_savesTaskAndReturnsResponse() {
         TaskRequest request = new TaskRequest("something", "nothing");
-        when(authUtils.getCurrentUser()).thenReturn(owner);
+        when(authUtils.getCurrentUserId()).thenReturn(owner.getId());
+        when(userService.getReferenceById(owner.getId())).thenReturn(owner);
 
         when(taskRepository.save(any(Task.class))).thenAnswer(invocation -> {
             Task saved = invocation.getArgument(0);
@@ -122,7 +123,7 @@ public class TaskServiceTest {
     @Test
     void deleteTask_softDeletesSuccessfully_whenUserMatches() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
-        when(authUtils.getCurrentUser()).thenReturn(owner);
+        when(authUtils.getCurrentUserId()).thenReturn(owner.getId());
 
         taskService.deleteTask(10L);
 
@@ -133,7 +134,7 @@ public class TaskServiceTest {
     @Test
     void deleteTask_throwsUnauthorized_andNeverDeletes_whenWrongUser() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
-        when(authUtils.getCurrentUser()).thenReturn(otherUser);
+        when(authUtils.getCurrentUserId()).thenReturn(otherUser.getId());
 
         assertThatThrownBy(() -> taskService.deleteTask(10L))
                 .isInstanceOf(ForbiddenException.class);
@@ -153,7 +154,7 @@ public class TaskServiceTest {
     @Test
     void updateTask_changesCompletionStatusSuccessfully() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
-        when(authUtils.getCurrentUser()).thenReturn(owner);
+        when(authUtils.getCurrentUserId()).thenReturn(owner.getId());
         when(taskRepository.save(task)).thenReturn(task);
 
         TaskResponse response = taskService.updateTask(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L);
@@ -167,7 +168,7 @@ public class TaskServiceTest {
     @Test
     void updateTask_throwsUnauthorized_whenWrongUser() {
         when(taskRepository.findById(10L)).thenReturn(Optional.of(task));
-        when(authUtils.getCurrentUser()).thenReturn(otherUser);
+        when(authUtils.getCurrentUserId()).thenReturn(otherUser.getId());
 
         assertThatThrownBy(() -> taskService.updateTask(new TaskUpdateRequest("title", "description", TaskStatus.IN_PROGRESS), 10L))
                 .isInstanceOf(ForbiddenException.class);

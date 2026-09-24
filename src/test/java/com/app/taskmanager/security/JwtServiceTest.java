@@ -34,6 +34,8 @@ public class JwtServiceTest {
                 .password("JohnPassword")
                 .role(Role.USER)
                 .build();
+
+        setField(user, "id", 1L);
     }
 
     @Test
@@ -45,31 +47,17 @@ public class JwtServiceTest {
     }
 
     @Test
-    void extractUsername_returnsCorrectSubjectFromToken() {
+    void extractId_returnsCorrectSubjectFromToken() {
         String token = jwtService.generateToken(user);
 
-        assertThat(jwtService.extractUsername(token)).isEqualTo(user.getUsername());
+        assertThat(jwtService.extractId(token)).isEqualTo(user.getId());
     }
 
     @Test
     void isTokenValid_returnsTrue_forCorrectUserAndFreshToken() {
         String token = jwtService.generateToken(user);
 
-        assertThat(jwtService.isTokenValid(token, user)).isTrue();
-    }
-
-    @Test
-    void isTokenValid_returnsFalse_whenUsernameDoesNotMatch() {
-        String token = jwtService.generateToken(user);
-
-        User mockUser = User.builder()
-                .username("Anna")
-                .email("Anna@email.com")
-                .password("AnnaPassword")
-                .role(Role.USER)
-                .build();
-
-        assertThat(jwtService.isTokenValid(token, mockUser)).isFalse();
+        assertThat(jwtService.isTokenValid(token)).isTrue();
     }
 
     @Test
@@ -78,15 +66,15 @@ public class JwtServiceTest {
 
         String expiredToken = jwtService.generateToken(user);
 
-        assertThat(jwtService.isTokenValid(expiredToken, user)).isFalse();
+        assertThat(jwtService.isTokenValid(expiredToken)).isFalse();
     }
 
     @Test
-    void extractUsername_throwsException_forTamperedToken() {
+    void extractId_throwsException_forTamperedToken() {
         String token = jwtService.generateToken(user);
         String tamperedToken = token + "badString";
 
-        assertThatThrownBy(() -> jwtService.extractUsername(tamperedToken))
+        assertThatThrownBy(() -> jwtService.extractId(tamperedToken))
                 .isInstanceOf(Exception.class);
     }
 }

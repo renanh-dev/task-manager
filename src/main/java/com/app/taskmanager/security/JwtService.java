@@ -6,7 +6,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -24,9 +23,8 @@ public class JwtService {
 
     public String generateToken(User user) {
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(String.valueOf(user.getId()))
                 .claim("role", user.getRole().name())
-                .claim("userId", user.getId())
                 .id(UUID.randomUUID().toString())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
@@ -34,28 +32,23 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token) {
         try {
-            final String username = extractUsername(token);
-            return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-        } catch (Exception ex) {
+            return parseClaims(token).getExpiration().after(new Date());
+        } catch (Exception e) {
             return false;
         }
     }
 
-    public String extractUsername(String token) {
-        return parseClaims(token).getSubject();
+    public Long extractId(String token) {
+        return Long.valueOf(parseClaims(token).getSubject());
     }
 
-    public String extractUserId(String token) {
-        return parseClaims(token).get("userId", Long.class).toString();
+    public String extractRole(String token) {
+        return parseClaims(token).get("role", String.class);
     }
 
     // - private helper methods -
-
-    private boolean isTokenExpired(String token) {
-        return parseClaims(token).getExpiration().before(new Date());
-    }
 
     private Claims parseClaims(String token) {
         return Jwts.parser()

@@ -99,7 +99,7 @@ public class RefreshTokenServiceTest {
                 .isInstanceOf(InvalidCredentialsException.class)
                 .hasMessage("Session invalidated due to token reuse. Please log in again.");
 
-        verify(refreshTokenRepository).revokeAllByActiveUser(refreshToken.getUser());
+        verify(refreshTokenRepository).revokeAllByUserId(refreshToken.getUser().getId());
     }
 
     @Test

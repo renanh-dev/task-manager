@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -47,7 +49,8 @@ public class UserServiceTest {
                 .build();
 
         setField(user, "id", 1L);
-        when(authUtils.getCurrentUser()).thenReturn(user);
+        when(authUtils.getCurrentUserId()).thenReturn(user.getId());
+        when(userRepository.findById(authUtils.getCurrentUserId())).thenReturn(Optional.of(user));
     }
 
     @Test

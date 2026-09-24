@@ -2,14 +2,15 @@ package com.app.taskmanager.repository;
 
 import com.app.taskmanager.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
-    Optional<User> findByUsername(String username);
 
     Optional<User> findByUsernameOrEmail(String username, String email);
 
@@ -18,4 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByUsernameOrEmail(String username, String email);
+
+    @Modifying // overrides @SQLRestriction so deletedAt restriction has to be added manually
+    @Query("UPDATE User u SET u.deletedAt = CURRENT_TIMESTAMP WHERE u.id = :userId AND u.deletedAt IS NULL")
+    void softDeleteByUserId(@Param("userId") Long userId);
 }

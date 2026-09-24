@@ -4,6 +4,7 @@ import com.app.taskmanager.dto.request.UserUpdateRequest;
 import com.app.taskmanager.dto.response.UserResponse;
 import com.app.taskmanager.entity.User;
 import com.app.taskmanager.exception.InvalidCredentialsException;
+import com.app.taskmanager.exception.ResourceNotFoundException;
 import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.AuthUtils;
 import lombok.RequiredArgsConstructor;
@@ -25,16 +26,17 @@ public class UserService {
 
     @Transactional
     public void deleteOwnUser() {
-        User user = authUtils.getCurrentUser();
-        user.softDelete();
+        Long userId = authUtils.getCurrentUserId();
 
-        userRepository.save(user);
-        log.info("User soft deleted, userId={}", user.getId());
+        userRepository.softDeleteByUserId(userId);
+
+        log.info("User soft deleted, userId={}", userId);
     }
 
     @Transactional
     public UserResponse changeCredentials(UserUpdateRequest request) {
-        User user = authUtils.getCurrentUser();
+        User user = userRepository.findById(authUtils.getCurrentUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (request.username() != null && userRepository.existsByUsername(request.username()) && !request.username().equals(user.getUsername())) {
             throw new InvalidCredentialsException("Username is already taken.");
@@ -54,6 +56,11 @@ public class UserService {
     }
 
     public UserResponse getCurrentUser() {
-        return UserResponse.from(authUtils.getCurrentUser());
+        return UserResponse.from(userRepository.findById(authUtils.getCurrentUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found")));
+    }
+
+    public User getReferenceById(Long userId) { // when in need of lazy initialization/proxy
+        return userRepository.getReferenceById(userId);
     }
 }
