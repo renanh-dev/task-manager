@@ -42,7 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             userId = jwtService.extractId(token);
             role = jwtService.extractRole(token);
-        } catch (JwtException ex) {
+        } catch (JwtException | IllegalArgumentException ex) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
