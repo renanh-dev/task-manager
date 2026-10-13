@@ -16,23 +16,31 @@
         </encoder>
     </appender>
 
+    <appender name="OTEL" class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <captureMdcAttributes>*</captureMdcAttributes>
+    </appender>
+
     <springProfile name="dev">
         <logger name="com.app.taskmanager" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="OTEL"/>
         </logger>
 
         <root level="WARN">
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="OTEL"/>
         </root>
     </springProfile>
 
     <springProfile name="prod">
         <logger name="com.app.taskmanager" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="OTEL"/>
         </logger>
 
         <root level="WARN">
             <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="OTEL"/>
         </root>
     </springProfile>
 
