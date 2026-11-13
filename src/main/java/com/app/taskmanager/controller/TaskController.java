@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,36 +20,47 @@ public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public TaskResponse createTask(@Valid @RequestBody TaskRequest taskRequest) {
-        return taskService.createTask(taskRequest);
+    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest taskRequest) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(taskService.createTask(taskRequest));
     }
 
     @GetMapping
-    public Page<TaskResponse> getTasks(Pageable pageable) {
-        return taskService.getTasks(pageable);
+    public ResponseEntity<Page<TaskResponse>> getTasks(Pageable pageable) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(taskService.getTasks(pageable));
     }
 
     @GetMapping("/filter")
-    public Page<TaskResponse> getTasksFiltered(@RequestParam(required = false) String title,
+    public ResponseEntity<Page<TaskResponse>> getTasksFiltered(@RequestParam(required = false) String title,
                                                @RequestParam(required = false) TaskStatus status,
                                                Pageable pageable) {
-        return taskService.getTasksFiltered(title, status, pageable);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(taskService.getTasksFiltered(title, status, pageable));
     }
 
     @GetMapping("/{id}")
-    public TaskResponse getTask(@PathVariable Long id) {
-        return taskService.getTask(id);
+    public ResponseEntity<TaskResponse> getTask(@PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(taskService.getTask(id));
     }
 
     @PatchMapping("/{id}")
-    public TaskResponse updateTask(@Valid @RequestBody TaskUpdateRequest taskUpdateRequest, @PathVariable Long id) {
-        return taskService.updateTask(taskUpdateRequest, id);
+    public ResponseEntity<TaskResponse> updateTask(@Valid @RequestBody TaskUpdateRequest taskUpdateRequest, @PathVariable Long id) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(taskService.updateTask(taskUpdateRequest, id));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTask(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }

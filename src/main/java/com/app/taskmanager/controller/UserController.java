@@ -6,6 +6,7 @@ import com.app.taskmanager.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -16,18 +17,24 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public UserResponse getCurrentUser() {
-        return userService.getCurrentUser();
+    public ResponseEntity<UserResponse> getCurrentUser() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.getCurrentUser());
     }
 
     @PatchMapping("/me")
-    public UserResponse changeCredentials(@Valid @RequestBody UserUpdateRequest request) {
-        return userService.changeCredentials(request);
+    public ResponseEntity<UserResponse> changeCredentials(@Valid @RequestBody UserUpdateRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.changeCredentials(request));
     }
 
     @DeleteMapping("/me")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteOwnUser() {
+    public ResponseEntity<Void> deleteOwnUser() {
         userService.deleteOwnUser();
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 }
