@@ -4,6 +4,7 @@ import com.app.taskmanager.dto.context.RefreshTokenContext;
 import com.app.taskmanager.entity.RefreshToken;
 import com.app.taskmanager.entity.User;
 import com.app.taskmanager.exception.InvalidCredentialsException;
+import com.app.taskmanager.exception.RefreshTokenException;
 import com.app.taskmanager.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class RefreshTokenService {
         return raw;
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = RefreshTokenException.class)
     public RefreshTokenContext validateAndRevoke(String raw) {
         RefreshToken token = refreshTokenRepository.findByTokenHash(hash(raw))
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid refresh token."));
@@ -52,12 +53,12 @@ public class RefreshTokenService {
         if (token.isRevoked()) {
             log.warn("Refresh token reuse detected, userId={}", token.getUser().getId());
             refreshTokenRepository.revokeAllByUserId(token.getUser().getId());
-            throw new InvalidCredentialsException("Session invalidated due to token reuse. Please log in again.");
+            throw new RefreshTokenException("Session invalidated due to token reuse. Please log in again.");
         }
 
         if (token.isExpired() || token.isAbsolutelyExpired()) {
             token.revoke();
-            throw new InvalidCredentialsException("Refresh token has expired.");
+            throw new RefreshTokenException("Refresh token has expired.");
         }
 
         token.revoke();

@@ -9,6 +9,7 @@ import com.app.taskmanager.entity.RefreshToken;
 import com.app.taskmanager.entity.User;
 import com.app.taskmanager.enums.Role;
 import com.app.taskmanager.exception.InvalidCredentialsException;
+import com.app.taskmanager.exception.RefreshTokenException;
 import com.app.taskmanager.exception.ResourceConflictException;
 import com.app.taskmanager.metrics.AppMetrics;
 import com.app.taskmanager.repository.UserRepository;
@@ -98,7 +99,7 @@ public class AuthService {
         return new AuthResponse(accessToken, refreshToken, user.getUsername(), user.getRole());
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = RefreshTokenException.class)
     public AuthResponse refresh(RefreshTokenRequest request) {
         RefreshTokenContext context = refreshTokenService.validateAndRevoke(request.refreshToken());
         String newAccessToken = jwtService.generateToken(context.user());
