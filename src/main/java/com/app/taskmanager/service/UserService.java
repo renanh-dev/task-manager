@@ -9,6 +9,8 @@ import com.app.taskmanager.repository.UserRepository;
 import com.app.taskmanager.security.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = "users", key = "@authUtils.getCurrentUserId()")
     public UserResponse changeCredentials(UserUpdateRequest request) {
         User user = userRepository.findById(authUtils.getCurrentUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
@@ -55,6 +58,7 @@ public class UserService {
         return UserResponse.from(userRepository.save(user));
     }
 
+    @Cacheable(value = "users", key = "@authUtils.getCurrentUserId()")
     public UserResponse getCurrentUser() {
         return UserResponse.from(userRepository.findById(authUtils.getCurrentUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found")));
