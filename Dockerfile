@@ -7,5 +7,11 @@ RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+
+RUN groupadd --system --gid 1001 app \
+ && useradd --system --uid 1001 --gid app --no-create-home --shell /usr/sbin/nologin app
+
+COPY --from=build --chown=app:app /app/target/*.jar app.jar
+
+USER 1001:1001
 ENTRYPOINT ["java", "-jar", "app.jar"]
