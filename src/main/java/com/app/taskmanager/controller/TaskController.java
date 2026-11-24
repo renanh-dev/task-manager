@@ -35,8 +35,8 @@ public class TaskController {
 
     @GetMapping("/filter")
     public ResponseEntity<Page<TaskResponse>> getTasksFiltered(@RequestParam(required = false) String title,
-                                               @RequestParam(required = false) TaskStatus status,
-                                               Pageable pageable) {
+                                                               @RequestParam(required = false) TaskStatus status,
+                                                               Pageable pageable) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(taskService.getTasksFiltered(title, status, pageable));

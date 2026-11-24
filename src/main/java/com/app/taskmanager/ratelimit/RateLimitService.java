@@ -14,13 +14,13 @@ import java.util.concurrent.TimeUnit;
 public class RateLimitService {
 
     private final Cache<String, Bucket> shortBuckets = Caffeine.newBuilder()
-            .maximumSize(10_000)
+            .maximumSize(100_000)
             .expireAfterAccess(2, TimeUnit.MINUTES)
             .build();
 
     private final Cache<String, Bucket> longBuckets = Caffeine.newBuilder()
-            .maximumSize(1_000)
-            .expireAfterAccess(20, TimeUnit.MINUTES)
+            .maximumSize(50_000)
+            .expireAfterAccess(15, TimeUnit.MINUTES)
             .build();
 
     public Bucket resolveBucket(String key, int capacity, Duration refill, BucketWindow window) {
